@@ -182,7 +182,7 @@ class UsersController extends Controller
             'bat_kwh' => $sum_total_kwh,
         ]);
 
-        //redirect to index
+        //redirect to indexs
         Alert::success('Success!', 'User Created Successfully');
         return back();
     }
