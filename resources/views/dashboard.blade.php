@@ -154,117 +154,138 @@
     </div>
     <!-- end Topbar -->
 
-    <!-- Start Content-->
-    <div class="container-fluid">
+     <!-- Start Content-->
+     <div class="container-fluid">
+        <!-- start page title -->
+        <div class="row">
+          <div class="col-12">
+            <div class="page-title-box">
+              <div class="page-title-right">
+              </div>
+              <h4 class="page-title">Power Meter Monitoring System</h4>
+            </div>
+          </div>
+        </div>
+        <!-- end page title -->
     <!-- start page title -->
     <div class="row">
-        <div class="col-12">
-        <div class="page-title-box">
-            <div class="page-title-right">
-            <form class="d-flex">
-                <div class="input-group">
-                <input
-                    type="text"
-                    class="form-control form-control-light"
-                    id="dash-daterange"
-                />
-                <span
-                    class="input-group-text bg-primary border-primary text-white"
-                >
-                    <i class="mdi mdi-calendar-range font-13"></i>
-                </span>
+        <div class="col-xl-5 col-lg-6">
+          <div class="row">
+            <div class="col-sm-6">
+              <div class="card widget-flat">
+                <div class="card-body">
+                  <h5
+                    class="text-muted fw-normal mt-0"
+                    title="Number of Customers">
+                    Today Energy
+                  </h5>
+                  <h3 class="mt-3 mb-3">36 kWh</h3>
+                  <p class="mb-0 text-muted">
+                    <span class="text-success me-2"
+                      ><i class="mdi mdi-arrow-up-bold"></i> 5.27%</span
+                    >
+                    <span class="text-nowrap">Since last day</span>
+                  </p>
                 </div>
-                <a
-                href="javascript: void(0);"
-                class="btn btn-primary ms-2"
-                >
-                <i class="mdi mdi-autorenew"></i>
-                </a>
-                <a
-                href="javascript: void(0);"
-                class="btn btn-primary ms-1"
-                >
-                <i class="mdi mdi-filter-variant"></i>
-                </a>
-            </form>
+                <!-- end card-body-->
+              </div>
+              <!-- end card-->
             </div>
-            <h4 class="page-title">Power Meter Monitoring System</h4>
-        </div>
-        </div>
-    </div>
-    <!-- end page title -->
-    <div class="row">
-            <div class="col-md-6 col-xl-3">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="row align-items-center">
-                            <div class="col">
-                                <h5 class="text-muted fw-normal mt-0" title="Campaign Sent">Today Energy</h5>
-                                <h3 class="my-2 py-1">0 kWh</h3>
-                                <p class="mb-0 text-muted">
-                                    <!-- <span class="text-success me-2"><i class="mdi mdi-arrow-up-bold"></i> 3.27%</span> -->
-                                </p>
-                            </div>
-                            
-                        </div> <!-- end row-->
-                    </div> <!-- end card-body -->
-                </div> <!-- end card -->
-            </div> <!-- end col -->
+            <!-- end col-->
 
-            
-            <div class="col-md-6 col-xl-3">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="row align-items-center">
-                            <div class="col">
-                                <h5 class="text-muted fw-normal mt-0" title="New Leads">Monthly Energy</h5>
-                                <h3 class="my-2 py-1">1 kWh</h3>
-                                <p class="mb-0 text-muted">
-                                    <!-- <span class="text-danger me-2"><i class="mdi mdi-arrow-down-bold"></i> 5.38%</span> -->
-                                </p>
-                            </div>
-                            
-                            
-                        </div> <!-- end row-->
-                    </div> <!-- end card-body -->
-                </div> <!-- end card -->
-            </div> <!-- end col -->
+            <div class="col-sm-6">
+              <div class="card widget-flat">
+                <div class="card-body">
+                  <h5
+                    class="text-muted fw-normal mt-0"
+                    title="Number of Orders">
+                    Week Energy
+                  </h5>
+                  <h3 class="mt-3 mb-3">80 kWh</h3>
+                  <p class="mb-0 text-muted">
+                    <span class="text-danger me-2"
+                      ><i class="mdi mdi-arrow-down-bold"></i> 1.08%</span
+                    >
+                    <span class="text-nowrap">Since last week</span>
+                  </p>
+                </div>
+                <!-- end card-body-->
+              </div>
+              <!-- end card-->
+            </div>
+            <!-- end col-->
+          </div>
+          <!-- end row -->
 
-            
-            <div class="col-md-6 col-xl-3">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="row align-items-center">
-                            <div class="col">
-                                <h5 class="text-muted fw-normal mt-0" title="Deals">Yearly Energy</h5>
-                                <h3 class="my-2 py-1">2 kWh</h3>
-                                <p class="mb-0 text-muted">
-                                    <!-- <span class="text-success me-2"><i class="mdi mdi-arrow-up-bold"></i> 4.87%</span> -->
-                                </p>
-                            </div>
-                            
-                        </div> <!-- end row-->
-                    </div> <!-- end card-body -->
-                </div> <!-- end card -->
-            </div> <!-- end col -->
+          <div class="row">
+            <div class="col-sm-6">
+              <div class="card widget-flat">
+                <div class="card-body">
+                  <h5
+                    class="text-muted fw-normal mt-0"
+                    title="Average Revenue">
+                    Month Energy
+                  </h5>
+                  <h3 class="mt-3 mb-3">60 kWh</h3>
+                  <p class="mb-0 text-muted">
+                    <span class="text-danger me-2"
+                      ><i class="mdi mdi-arrow-down-bold"></i> 7.00%</span
+                    >
+                    <span class="text-nowrap">Since last month</span>
+                  </p>
+                </div>
+                <!-- end card-body-->
+              </div>
+              <!-- end card-->
+            </div>
+            <!-- end col-->
 
-            <div class="col-md-6 col-xl-3">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="row align-items-center">
-                            <div class="col">
-                                <h5 class="text-muted fw-normal mt-0" title="Booked Revenue">Total Energy</h5>
-                                <h3 class="my-2 py-1">3 Mwh</h3>
-                                <p class="mb-0 text-muted">
-                                    <!-- <span class="text-success me-2"><i class="mdi mdi-arrow-up-bold"></i> 11.7%</span> -->
-                                </p>
-                            </div>
-                            
-                        </div> <!-- end row-->
-                    </div> <!-- end card-body -->
-                </div> <!-- end card -->
-            </div> <!-- end col -->
+            <div class="col-sm-6">
+              <div class="card widget-flat">
+                <div class="card-body">
+                  <h5 class="text-muted fw-normal mt-0" title="Growth">
+                    Total Energy
+                  </h5>
+                  <h3 class="mt-3 mb-3">30 kWh</h3>
+                  <p class="mb-0 text-muted">
+                    <span class="text-success me-2"
+                      ><i class="mdi mdi-arrow-up-bold"></i> 4.87%</span
+                    >
+                    <span class="text-nowrap">Since last month</span>
+                  </p>
+                </div>
+                <!-- end card-body-->
+              </div>
+              <!-- end card-->
+            </div>
+            <!-- end col-->
+          </div>
+          <!-- end row -->
         </div>
+        <!-- end col -->
+        <div class="col-xl-7 col-lg-6">
+            <div class="card card-h-100">
+              <div class="card-body">
+                <div
+                  class="d-flex justify-content-between align-items-center mb-2"
+                >
+                  <h4 class="header-title">Total battery power usage history per month</h4>
+                </div>
+
+                <div dir="ltr" style="height: 50px">
+                   <div
+                    id="high-performing-product"
+                    class="apex-charts"
+                    data-colors="#727cf5,#e3eaef"></div> 
+                    <canvas id="myChart"></canvas>
+                </div>
+              </div>
+              <!-- end card-body-->
+            </div>
+            <!-- end card-->
+          </div>
+          <!-- end col -->
+</div>
         <br>
         <br>
 

@@ -196,16 +196,16 @@
             <table class="table table-centered table-nowrap mb-0">
                 <thead>                        
                     <tr>                                
-                        <th>Battery Capacity (kWh)</th>
-                        <th>Electricity Requirements (Watt/Hour)</th>
-                        <th>Electricity Requirements (kWh)</th>
+                        <th>Listrik yang dihasilkan (kWh)</th>
+                        <th>Listrik yang dibutuhkan (kWh)</th>
+                        <th>Listik yang Masuk ke Baterai (kWh)</th>
                         <th>Record Date</th>                        
                     </tr>
                 </thead>
                 <tbody>
                     @foreach($record_data as $record)
                     <tr>
-                        <td>{{$record->battery_watt}} Watt</td>
+                        <td>{{$record->available_watts}} Watt</td>
                         <td>{{$record->watt_hour}} kWh</td>
                         <td>{{$record->use_kwh}} kWh</td>
                         <td>{{$record->created_at}}</td>

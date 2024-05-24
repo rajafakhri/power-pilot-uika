@@ -11,5 +11,5 @@ class MetersModel extends Model
 
     protected $table = "meters";
     protected $primaryKey = 'id_meters';
-    protected $fillable = ['nm_meters','m_volt','m_ampere','m_watt','id_battery','created_at','updated_at'];
+    protected $fillable = ['nm_meters','m_volt','m_ampere','m_watt','id_battery','m_expore','m_import','created_at','updated_at'];
 }

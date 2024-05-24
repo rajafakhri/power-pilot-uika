@@ -32,7 +32,7 @@ Route::get('/', function () {
 //     return view('dashboard');
 // })->middleware(['auth', 'verified'])->name('dashboard');
 
-route::get('/dashboard',[HomeController::class,'index'])->middleware('auth')->name('home');
+route::get('/home',[HomeController::class,'index'])->middleware('auth')->name('home');
 
 Route::middleware('auth','admin')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

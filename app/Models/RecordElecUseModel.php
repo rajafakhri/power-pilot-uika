@@ -11,5 +11,5 @@ class RecordElecUseModel extends Model
 
     protected $table = "record_elec_use";
     protected $primaryKey = 'id_rec_elec_use';
-    protected $fillable = ['id_users','battery_watt','watt_hour','use_kwh','created_at','updated_at'];
+    protected $fillable = ['id_users','available_watts','watt_hour','use_kwh','created_at','updated_at'];
 }

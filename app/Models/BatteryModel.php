@@ -11,5 +11,5 @@ class BatteryModel extends Model
 
     protected $table = "battery";
     // protected $primaryKey = 'id_battery';
-    protected $fillable = ['id_battery','id_users','nm_battery','capacity','created_at','updated_at'];
+    protected $fillable = ['id_battery','id_users','nm_battery','capacity','bat_kwh','created_at','updated_at'];
 }

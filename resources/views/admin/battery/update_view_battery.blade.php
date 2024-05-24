@@ -232,7 +232,7 @@
                                             </div>
 
                                             <div class="mb-3">
-                                                <label for="simpleinput" class="form-label">Capacity (mAh)</label>
+                                                <label for="simpleinput" class="form-label">Capacity (kWh)</label>
                                                 <input type="number" id="simpleinput" class="form-control @error('capacity') is-invalid @enderror" name="capacity" value="{{old('capacity', $get_battery->capacity)}}">
                                                 @error('capacity')
                                                 <span class="invalid-feedback" role="alert">

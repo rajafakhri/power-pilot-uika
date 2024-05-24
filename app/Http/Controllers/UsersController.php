@@ -161,14 +161,25 @@ class UsersController extends Controller
 
         $sum_watt_kwh = $get_watt / 1000;
     
-        $watt_rand_hour = rand(0, 9999999) / 1000;
+        $watt_rand_hour = rand(0, 99999) / 1000;
         $total_usege = $sum_watt_kwh - $watt_rand_hour;
         //create post
         RecordElecUseModel::create([
             'id_users'     => $id,
-            'battery_watt'     => $sum_watt_kwh,
+            'available_watts'     => $sum_watt_kwh, //
             'watt_hour'   => $watt_rand_hour,
-            'use_kwh'   => $total_usege,            
+            'use_kwh'   => $total_usege,
+        ]);
+        
+        $sum_kwh_batt = $battery_user->bat_kwh + $total_usege;
+        if($sum_kwh_batt >= $battery_user->bat_kwh){
+            $sum_total_kwh = $sum_kwh_batt;            
+        }else{
+            $sum_total_kwh = $battery_user->capacity;
+        }
+
+        $battery_user->where('id_battery',$battery_user->id_battery)->update([
+            'bat_kwh' => $sum_total_kwh,
         ]);
 
         //redirect to index
