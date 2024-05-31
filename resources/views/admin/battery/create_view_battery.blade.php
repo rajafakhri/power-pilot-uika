@@ -201,16 +201,6 @@
                                         <form id="form add-battery-f" action="{{ route('battery.store') }}" method="POST" enctype="multipart/form-data">
                                             @csrf
                                             <div class="mb-3">
-                                                <label for="simpleinput" class="form-label">ID Battery</label>
-                                                <input type="text" id="simpleinput" class="form-control @error('id_battery') is-invalid @enderror" name="id_battery" value="{{old('id_battery')}}">
-                                                @error('id_battery')
-                                                <span class="invalid-feedback" role="alert">
-                                                    <strong>{{ $message }}</strong>
-                                                </span>
-                                                @enderror
-                                            </div>
-
-                                            <div class="mb-3">
                                                 <label for="simpleinput" class="form-label">Users</label>                                                
                                                 <select name="id_users" id="idUsers" class="form-control @error('id_users') is-invalid @enderror" >
                                                     <option value="" disabled selected>Select User</option>

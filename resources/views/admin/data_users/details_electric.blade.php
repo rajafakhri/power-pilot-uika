@@ -190,24 +190,52 @@
         <br>
         <!-- end page title -->
 
-        
+        <?php
+            $count_batt = DB::table('battery')->where('id_users',$id)->count();
+            $get_batt = DB::table('battery')->where('id_users',$id)->get();            
+        ?>    
+
         <h4>Electrical Capacity <a href="{{route('users.details.random')}}/{{$id}}" class="btn btn-primary"><i class="mdi mdi-reload"></i></a></h4>         
         <div class="table-responsive">
             <table class="table table-centered table-nowrap mb-0">
                 <thead>                        
                     <tr>                                
-                        <th>Listrik yang dihasilkan (kWh)</th>
-                        <th>Listrik yang dibutuhkan (kWh)</th>
-                        <th>Listik yang Masuk ke Baterai (kWh)</th>
-                        <th>Record Date</th>                        
+                        <th rowspan="2">No</th>
+                        <th rowspan="2">User</th>
+                        <th colspan="3">Generator</th>
+                        <th colspan="{{$count_batt}}">Battery</th>
+                        <th rowspan="2">Usage</th>
+                        <th rowspan="2">Export</th>
+                        <th rowspan="2">Import</th>
+                        <th rowspan="2">Total</th>                        
+                        <th rowspan="2">Record Date</th>                        
+                    </tr>
+                    <tr>
+                        <td>G1</td>
+                        <td>G2</td>
+                        <td>G3</td>                                            
+                        @foreach($get_batt as $battery)                        
+                        <td>{{$battery->nm_battery}}</td>
+                        @endforeach
                     </tr>
                 </thead>
-                <tbody>
-                    @foreach($record_data as $record)
+                <tbody> 
+                    @php $no=1; @endphp
+                    @foreach($record_data as $record)        
                     <tr>
-                        <td>{{$record->available_watts}} Watt</td>
-                        <td>{{$record->watt_hour}} kWh</td>
-                        <td>{{$record->use_kwh}} kWh</td>
+                        <td>{{$no++}}</td>
+                        <td>{{$record->name}}</td>
+                        <td>{{$record->gen_1}} Watt</td>
+                        <td>{{$record->gen_2}} Watt</td>
+                        <td>{{$record->gen_3}} Watt</td>                        
+                        @foreach($get_batt as $battery)
+                            <td>{{$battery->bat_watt}} Watt</td>
+                        @endforeach
+
+                        <td>{{$record->elec_usage}} Watt</td>
+                        <td>{{$record->elec_export}} Watt</td>
+                        <td>{{$record->elec_import}} Watt</td>
+                        <td>{{($record->gen_1 + $record->gen_2 + $record->gen_3 + $record->elec_import ) - ($record->elec_usage - $record->elec_export)}} Watt</td>
                         <td>{{$record->created_at}}</td>
                     </tr>
                     @endforeach

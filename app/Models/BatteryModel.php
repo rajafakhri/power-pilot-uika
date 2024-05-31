@@ -10,6 +10,6 @@ class BatteryModel extends Model
     use HasFactory;
 
     protected $table = "battery";
-    // protected $primaryKey = 'id_battery';
-    protected $fillable = ['id_battery','id_users','nm_battery','capacity','bat_kwh','created_at','updated_at'];
+    protected $primaryKey = 'id_battery';
+    protected $fillable = ['id_battery','id_users','nm_battery','capacity','bat_watt','residu_val','created_at','updated_at'];
 }

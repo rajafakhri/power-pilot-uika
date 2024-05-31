@@ -200,21 +200,33 @@
             <table class="table table-centered table-nowrap mb-0">
                 <thead class="table-light">
                     <tr>
-                        <th>No</th>                        
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th style="width: 125px;">Action</th>
+                    <th>No</th>
+                    <th>User</th>
+                    <th colspan="3">Generator</th>
+                    <th colspan="3">Battery</th>
+                    <th>Usage</th>
+                    <th>Export</th>
+                    <th>Import</th>
+                    <th>Total</th>
+                    <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
                     @php $no=1; @endphp
-                    @foreach($users as $user)
+                    @foreach($users as $user)                    
                     <tr>                        
                         <td>{{$no++}}</td>
                         <td>{{$user->name}}</td>
-                        <td>
-                            <h5 class="my-0">{{$user->email}}</h5>                            
-                        </td>                        
+                        <td>G1</td>
+                        <td>G2</td>
+                        <td>G3</td>
+                        <td>B1-NameUsers</td>
+                        <td>B2-NameUsers</td>
+                        <td>B3-NameUsers</td>
+                        <td>---</td>
+                        <td>---</td>
+                        <td>---</td>
+                        <td>---</td>
                         <td>
                             <form onsubmit="return confirm('Are you sure ?');" action="{{ route('users.destroy', $user->id) }}" method="POST">
                                 <a href="{{route('users.details')}}/{{$user->id}}" class="btn btn-primary"><i class="mdi mdi-home"></i></a>

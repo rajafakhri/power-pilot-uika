@@ -104,15 +104,6 @@
             </li>
             <li class="side-nav-item">
               <a
-                href="{{route('meters.index')}}"
-                class="side-nav-link"
-              >
-                <i class="dripicons-meter"></i>
-                <span> Meters </span>
-              </a>
-            </li>
-            <li class="side-nav-item">
-              <a
                 href="{{route('battery.index')}}"
                 class="side-nav-link"
               >

@@ -35,23 +35,29 @@ class BatteryController extends Controller
     public function store(Request $request)
     {
         //validate form
-        $request->validate([
-            'id_battery' => ['required', 'string', 'max:255','unique:'.BatteryModel::class],
+        $request->validate([            
             'id_users' => ['required', 'integer'],
             'nm_battery' => ['required', 'string', 'max:255',],
             'capacity' => ['required','integer'],
         ]);
 
-        //create post
-        BatteryModel::create([            
-            'id_battery'     => $request->id_battery,
-            'id_users'     => $request->id_users,
-            'nm_battery'   => $request->nm_battery,
-            'capacity'   => $request->capacity,            
-        ]);
-        //redirect to index
-        Alert::success('Success!', 'Battery Created Successfully');
-        return redirect()->route('battery.index');
+        $count_batt = DB::table('battery')->where('id_users',$request->id_users,)->count();
+        if($count_batt < 3){
+            //create post
+            BatteryModel::create([
+                'id_users'     => $request->id_users,
+                'nm_battery'   => $request->nm_battery,
+                'capacity'   => $request->capacity,
+                'residu_val'   => $request->capacity,
+            ]);
+            //redirect to index
+            Alert::success('Success!', 'Battery Created Successfully');
+            return redirect()->route('battery.index');
+        }else{
+            //redirect to index
+            Alert::error('Error!', 'Battery is More Than 3');
+            return redirect()->route('battery.index');
+        }
 
     }
 
@@ -93,6 +99,7 @@ class BatteryController extends Controller
             'id_users'     => $request->id_users,             
             'nm_battery'   => $request->nm_battery,
             'capacity'   => $request->capacity,
+            'residu_val'   => $request->capacity,
         ]);
         //redirect to index
         Alert::success('Success!', 'Battery Updated Successfully');
