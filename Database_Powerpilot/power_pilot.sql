@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 15, 2024 at 04:08 PM
+-- Generation Time: Jun 05, 2024 at 01:45 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -28,10 +28,12 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `battery` (
-  `id_battery` varchar(255) NOT NULL,
+  `id_battery` int(11) NOT NULL,
   `id_users` bigint(20) UNSIGNED NOT NULL,
   `nm_battery` varchar(255) NOT NULL,
   `capacity` int(11) NOT NULL,
+  `bat_watt` int(11) NOT NULL DEFAULT 0,
+  `residu_val` int(11) NOT NULL DEFAULT 0,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -40,9 +42,10 @@ CREATE TABLE `battery` (
 -- Dumping data for table `battery`
 --
 
-INSERT INTO `battery` (`id_battery`, `id_users`, `nm_battery`, `capacity`, `created_at`, `updated_at`) VALUES
-('BT1234', 2, 'Batrai AG', 11000, '2024-05-04 00:29:02', '2024-05-04 02:17:51'),
-('ID33312', 4, 'Batrai A', 123123123, '2024-05-04 03:14:54', '2024-05-04 04:11:42');
+INSERT INTO `battery` (`id_battery`, `id_users`, `nm_battery`, `capacity`, `bat_watt`, `residu_val`, `created_at`, `updated_at`) VALUES
+(1, 2, 'Batrai AG', 1000, 0, 1000, '2024-05-04 00:29:02', '2024-05-30 21:52:24'),
+(2, 2, 'Batrai A', 1000, 0, 1000, '2024-05-04 03:14:54', '2024-05-30 20:55:31'),
+(3, 2, 'Batrai A3', 1000, 0, 1000, '2024-05-31 16:21:21', '2024-05-31 16:21:21');
 
 -- --------------------------------------------------------
 
@@ -63,6 +66,23 @@ CREATE TABLE `failed_jobs` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `generator`
+--
+
+CREATE TABLE `generator` (
+  `id_generator` int(11) NOT NULL,
+  `id_users` int(11) NOT NULL,
+  `kd_gen1` varchar(255) NOT NULL,
+  `total_watt_gen1` int(11) DEFAULT NULL,
+  `kd_gen2` varchar(255) DEFAULT NULL,
+  `total_watt_gen2` int(11) DEFAULT NULL,
+  `kd_gen3` varchar(255) DEFAULT NULL,
+  `total_watt_gen3` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `meters`
 --
 
@@ -73,6 +93,8 @@ CREATE TABLE `meters` (
   `m_ampere` int(11) NOT NULL,
   `m_watt` int(11) NOT NULL,
   `id_battery` varchar(255) NOT NULL,
+  `m_expore` varchar(1000) DEFAULT NULL,
+  `m_import` varchar(1000) DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -81,8 +103,8 @@ CREATE TABLE `meters` (
 -- Dumping data for table `meters`
 --
 
-INSERT INTO `meters` (`id_meters`, `nm_meters`, `m_volt`, `m_ampere`, `m_watt`, `id_battery`, `created_at`, `updated_at`) VALUES
-(1, 'Meter 2', 15554, 15554, 241926916, 'BT1234', '2024-05-04 03:24:29', '2024-05-04 03:40:07');
+INSERT INTO `meters` (`id_meters`, `nm_meters`, `m_volt`, `m_ampere`, `m_watt`, `id_battery`, `m_expore`, `m_import`, `created_at`, `updated_at`) VALUES
+(1, 'Meter 2', 400, 400, 160000, '1', '', '', '2024-05-04 03:24:29', '2024-05-24 16:14:18');
 
 -- --------------------------------------------------------
 
@@ -146,21 +168,15 @@ CREATE TABLE `personal_access_tokens` (
 CREATE TABLE `record_elec_use` (
   `id_rec_elec_use` int(11) NOT NULL,
   `id_users` bigint(20) UNSIGNED NOT NULL,
-  `battery_watt` int(11) NOT NULL,
-  `watt_hour` int(11) NOT NULL,
-  `use_kwh` int(11) NOT NULL,
+  `gen_1` int(11) NOT NULL DEFAULT 0,
+  `gen_2` int(11) NOT NULL DEFAULT 0,
+  `gen_3` int(11) DEFAULT 0,
+  `elec_usage` int(11) NOT NULL DEFAULT 0,
+  `elec_export` int(11) NOT NULL DEFAULT 0,
+  `elec_import` int(11) NOT NULL DEFAULT 0,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `record_elec_use`
---
-
-INSERT INTO `record_elec_use` (`id_rec_elec_use`, `id_users`, `battery_watt`, `watt_hour`, `use_kwh`, `created_at`, `updated_at`) VALUES
-(5, 2, 241927, 5120, 236807, '2024-05-04 05:10:09', '2024-05-04 05:10:09'),
-(6, 4, 0, 3742, -3742, '2024-05-04 05:10:31', '2024-05-04 05:10:31'),
-(7, 2, 241927, 714, 241213, '2024-05-15 06:44:28', '2024-05-15 06:44:28');
 
 -- --------------------------------------------------------
 
@@ -185,8 +201,8 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `level`, `name`, `email`, `email_verified_at`, `password`, `remember_token`, `created_at`, `updated_at`) VALUES
-(2, 1, 'Mohamad Raja Fakhri', 'rajafakhrir7@gmail.com', NULL, '$2y$10$8EKT0TbgFEgYFNAW0bnh7uyOksfwFhYhnV8OAHz6QXDaauFvbUV1i', 's4heZrxzyOk9VorjuGVt68xqVleKIiVhpF8irzjPlKVzjov2yaoM9Zebs7eS', '2024-04-13 23:04:16', '2024-05-02 04:57:01'),
-(4, 1, 'Raja', 'rajafakhrir@yahoo.co.id', NULL, '$2y$10$CI6RlLv3VCXnjDkTPvOVC.QiUyx5j0NQe3Bz6ZG9/5glhUFzKrnvW', NULL, '2024-04-24 06:29:51', '2024-04-24 06:29:51'),
+(2, 1, 'Mohamad Raja Fakhri', 'rajafakhrir7@gmail.com', NULL, '$2y$10$8EKT0TbgFEgYFNAW0bnh7uyOksfwFhYhnV8OAHz6QXDaauFvbUV1i', '1BW0RyDPg4gFi3Po0FC279O4mvAsoVH3C1VQR2lQA29inywibTqU3vScDkRo', '2024-04-13 23:04:16', '2024-05-02 04:57:01'),
+(4, 2, 'Raja', 'rajafakhrir@yahoo.co.id', NULL, '$2y$10$CI6RlLv3VCXnjDkTPvOVC.QiUyx5j0NQe3Bz6ZG9/5glhUFzKrnvW', NULL, '2024-04-24 06:29:51', '2024-04-24 06:29:51'),
 (6, 1, 'Raja', 'raja1@triwala.co.id', NULL, '$2y$10$jG/C6tc0ByNs7H.rym8/HeH8KXKvZNWEOasxtWl.Bc88pUlVW5h9m', NULL, '2024-05-15 06:26:06', '2024-05-15 06:26:06');
 
 --
@@ -198,7 +214,6 @@ INSERT INTO `users` (`id`, `level`, `name`, `email`, `email_verified_at`, `passw
 --
 ALTER TABLE `battery`
   ADD PRIMARY KEY (`id_battery`),
-  ADD UNIQUE KEY `id_battery` (`id_battery`),
   ADD KEY `id_users` (`id_users`);
 
 --
@@ -207,6 +222,14 @@ ALTER TABLE `battery`
 ALTER TABLE `failed_jobs`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `failed_jobs_uuid_unique` (`uuid`);
+
+--
+-- Indexes for table `generator`
+--
+ALTER TABLE `generator`
+  ADD PRIMARY KEY (`id_generator`),
+  ADD UNIQUE KEY `kd_generator` (`kd_gen1`),
+  ADD KEY `id_users` (`id_users`);
 
 --
 -- Indexes for table `meters`
@@ -254,16 +277,28 @@ ALTER TABLE `users`
 --
 
 --
+-- AUTO_INCREMENT for table `battery`
+--
+ALTER TABLE `battery`
+  MODIFY `id_battery` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
 -- AUTO_INCREMENT for table `failed_jobs`
 --
 ALTER TABLE `failed_jobs`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `generator`
+--
+ALTER TABLE `generator`
+  MODIFY `id_generator` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `meters`
 --
 ALTER TABLE `meters`
-  MODIFY `id_meters` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id_meters` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `migrations`
@@ -281,7 +316,7 @@ ALTER TABLE `personal_access_tokens`
 -- AUTO_INCREMENT for table `record_elec_use`
 --
 ALTER TABLE `record_elec_use`
-  MODIFY `id_rec_elec_use` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id_rec_elec_use` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=90;
 
 --
 -- AUTO_INCREMENT for table `users`
@@ -298,12 +333,6 @@ ALTER TABLE `users`
 --
 ALTER TABLE `battery`
   ADD CONSTRAINT `battery_ibfk_1` FOREIGN KEY (`id_users`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
---
--- Constraints for table `meters`
---
-ALTER TABLE `meters`
-  ADD CONSTRAINT `meters_ibfk_2` FOREIGN KEY (`id_battery`) REFERENCES `battery` (`id_battery`) ON DELETE CASCADE ON UPDATE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

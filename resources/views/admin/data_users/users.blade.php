@@ -215,7 +215,7 @@
                     @php $no=1; @endphp
                     @foreach($users as $user)
                     <?php
-                        $check_record = DB::table('record_elec_use')->where('id_users',$user->id)->first();
+                        $check_record = DB::table('record_elec_use')->where('id_users',$user->id)->orderBy('id_rec_elec_use','DESC')->first();
                         $get_battery = DB::table('battery')->where('id_users',$user->id)->get();
                         $count_battery = DB::table('battery')->where('id_users',$user->id)->count();
                         $data_usage = DB::table('record_elec_use')->where('id_users',$user->id)->sum('elec_usage');
