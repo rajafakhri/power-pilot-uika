@@ -226,7 +226,7 @@
                                             </div>
 
                                             <div class="mb-3">
-                                                <label for="simpleinput" class="form-label">Capacity (kWh)</label>
+                                                <label for="simpleinput" class="form-label">Capacity (Watt)</label>
                                                 <input type="number" id="simpleinput" class="form-control @error('capacity') is-invalid @enderror" name="capacity" value="{{old('capacity')}}">
                                                 @error('capacity')
                                                 <span class="invalid-feedback" role="alert">

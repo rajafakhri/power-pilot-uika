@@ -157,11 +157,11 @@ class UsersController extends Controller
 
     public function rand_watt_home($id){        
         
-        $gen_1 = 1000; //Generator 1
-        $gen_2 = 200; //Generator 2
-        $gen_3 = 200; //Generator 3
+        $gen_1 = 0; //Generator 1
+        $gen_2 = 0; //Generator 2
+        $gen_3 = 0; //Generator 3
         
-        $usage = 1000;  //Pemakaian Listrik
+        $usage = 3100;  //Pemakaian Listrik
         $sum_generator = $gen_1 + $gen_2 + $gen_3; //Hitung Listrik dari Generator
         $sum_gen_usage = $sum_generator - $usage; // Jumlah Generator - Pemakaian        
 
@@ -175,8 +175,8 @@ class UsersController extends Controller
                 $sum_elec_to_batt = $battery_user->bat_watt + $sum_gen_usage; //Sisa Listrik dalam Battery + Sisa Listrik yang diimport
     
                 // Jika Jumlah Listrik Lebih Besar dari Kapasitas Tampung Battery
-                if($sum_elec_to_batt > $battery_user->capacity){
-                    $kelebihan_elec = $sum_elec_to_batt - $battery_user->capacity;
+                if($sum_elec_to_batt > $battery_user->residu_val){
+                    $kelebihan_elec = $sum_elec_to_batt - $battery_user->residu_val;
                     // Update Ke Listrik Penuh
                     $update_bat = DB::table('battery')->where('id_battery',$battery_user->id_battery)->update([
                         'bat_watt' => $battery_user->capacity,
@@ -186,23 +186,98 @@ class UsersController extends Controller
                     // Cari Battery Lain yang Dapat Menampung Listrik
                     $battery_user2 = DB::table('battery')->where('id_users',$id)->where('residu_val','>',0)->first(); 
                     if($battery_user2 == TRUE){
-                        $residu_batt = $battery_user2->residu_val - $kelebihan_elec; 
-                        $update_bat = DB::table('battery')->where('id_battery',$battery_user2->id_battery)->update([
-                            'bat_watt' => $kelebihan_elec,
-                            'residu_val' => $residu_batt,
-                        ]);                    
-                        RecordElecUseModel::create([
-                            'id_users'     => $id,
-                            'gen_1'     => $gen_1,
-                            'gen_2'     => $gen_2,
-                            'gen_3'     => $gen_3,
-                            'elec_usage' => $usage,
-                            'elec_export' => 0,
-                            'elec_import' => 0,
-                        ]);
+                        if($kelebihan_elec > $battery_user2->residu_val){
+                            $kelebihan_elec2 = $kelebihan_elec - $battery_user2->residu_val;
+                            $update_bat2 = DB::table('battery')->where('id_battery',$battery_user2->id_battery)->update([
+                                'bat_watt' => $battery_user2->capacity,
+                                'residu_val' => 0,
+                            ]);
+
+                            $battery_user3 = DB::table('battery')->where('id_users',$id)->where('residu_val','>',0)->first();
+                            if($battery_user3 == TRUE){                                
+                                if($kelebihan_elec2 > $battery_user3->residu_val){
+                                    $kelebihan_elec3 = $kelebihan_elec2 - $battery_user3->residu_val;
+                                    $update_bat3 = DB::table('battery')->where('id_battery',$battery_user3->id_battery)->update([
+                                        'bat_watt' => $battery_user3->capacity,
+                                        'residu_val' => 0,
+                                    ]);
+                                    RecordElecUseModel::create([
+                                        'id_users'  => $id,
+                                        'gen_1'     => $gen_1,
+                                        'gen_2'     => $gen_2,
+                                        'gen_3'     => $gen_3,
+                                        'elec_usage' => $usage,
+                                        'elec_export' => $kelebihan_elec3,
+                                        'elec_import' => 0,
+                                    ]);
+
+                                    //redirect to indexs
+                                    Alert::success('Success!', 'User Created Successfully');
+                                    return back();
+
+                                }else{
+                                    $kelebihan_elec3 = $battery_user3->residu_val - $kelebihan_elec2;
+                                    $residu_new3 = $battery_user3->capacity - $kelebihan_elec3;
+                                    $update_bat3 = DB::table('battery')->where('id_battery',$battery_user3->id_battery)->update([
+                                        'bat_watt' => $kelebihan_elec3,
+                                        'residu_val' => $residu_new3,
+                                    ]);
+                                    // Masih Bisa Mandiri                            
+                                    RecordElecUseModel::create([
+                                        'id_users'     => $id,
+                                        'gen_1'     => $gen_1,
+                                        'gen_2'     => $gen_2,
+                                        'gen_3'     => $gen_3,
+                                        'elec_usage' => $usage,
+                                        'elec_export' => 0,
+                                        'elec_import' => 0,
+                                    ]);
+
+                                    //redirect to indexs
+                                    Alert::success('Success!', 'User Created Successfully');
+                                    return back();
+                                }
+                            }else{
+                                // Jika Tidak ada Battery yang menampung Maka Export                    
+                                RecordElecUseModel::create([
+                                    'id_users'     => $id,
+                                    'gen_1'     => $gen_1,
+                                    'gen_2'     => $gen_2,
+                                    'gen_3'     => $gen_3,
+                                    'elec_usage' => $usage,
+                                    'elec_export' => $kelebihan_elec2,
+                                    'elec_import' => 0,
+                                ]);
+
+                                //redirect to indexs
+                                Alert::success('Success!', 'User Created Successfully');
+                                return back();
+                            }
+                        }else{
+                            $kelebihan_elec2 = $battery_user2->residu_val - $kelebihan_elec;
+                            $residu_new2 = $battery_user2->capacity - $kelebihan_elec2;
+                            $update_bat2 = DB::table('battery')->where('id_battery',$battery_user2->id_battery)->update([
+                                'bat_watt' => $kelebihan_elec2,
+                                'residu_val' => $residu_new2,
+                            ]);
+                            // Masih Bisa Mandiri                            
+                            RecordElecUseModel::create([
+                                'id_users'     => $id,
+                                'gen_1'     => $gen_1,
+                                'gen_2'     => $gen_2,
+                                'gen_3'     => $gen_3,
+                                'elec_usage' => $usage,
+                                'elec_export' => 0,
+                                'elec_import' => 0,
+                            ]);
+
+                            //redirect to indexs
+                            Alert::success('Success!', 'User Created Successfully');
+                            return back();
+                        }
     
                     }else{
-                        // Jika Tidak ada Battery yang menampung Maka Export                    
+                        // Jika Tidak ada Battery yang menampung Maka Export
                         RecordElecUseModel::create([
                             'id_users'     => $id,
                             'gen_1'     => $gen_1,
@@ -212,9 +287,14 @@ class UsersController extends Controller
                             'elec_export' => $kelebihan_elec,
                             'elec_import' => 0,
                         ]);
+
+                        //redirect to indexs
+                        Alert::success('Success!', 'User Created Successfully');
+                        return back();
                     }
     
                 }else{
+                    // Jika Masih Bisa Mandiri
                     $residu_batt = $battery_user->residu_val - $sum_gen_usage; 
                     $update_bat = DB::table('battery')->where('id_battery',$battery_user->id_battery)->update([
                         'bat_watt' => $sum_elec_to_batt,
@@ -236,10 +316,164 @@ class UsersController extends Controller
                 Alert::success('Success!', 'User Created Successfully');
                 return back();
                  
+            }else{
+                // Tidak ada Battery yang bisa menampung sama sekali
+                RecordElecUseModel::create([
+                    'id_users'      => $id,
+                    'gen_1'         => $gen_1,
+                    'gen_2'         => $gen_2,
+                    'gen_3'         => $gen_3,
+                    'elec_usage'    => $usage,
+                    'elec_export'   => $sum_gen_usage,
+                    'elec_import'   => 0,
+                ]);
+
+                //redirect to indexs
+                Alert::success('Success!', 'User Created Successfully');
+                return back();
             }
     
         }else{ 
             // Ini Import
+
+            //Ambil Battrai yang masih menampung Listrik
+            $battery_user_imp = DB::table('battery')->where('id_users',$id)->where('bat_watt','>',0)->first(); //Ambil listrik dari batrai yang punya listrik
+            if($battery_user_imp == TRUE){
+                $kurang_bat =  $battery_user_imp->bat_watt + $sum_gen_usage; //Ambil pengurangan Listrik dengan Listrik yang dibutuhkan                
+                if($kurang_bat <= 0){                    
+                    // Update Ke Listrik Penuh
+                    $update_bat = DB::table('battery')->where('id_battery',$battery_user_imp->id_battery)->update([
+                        'bat_watt' => 0,
+                        'residu_val' => $battery_user_imp->capacity,
+                    ]);
+
+                    // Cari Battery Lain yang masih Menampung Listrik
+                    $battery_user2_imp = DB::table('battery')->where('id_users',$id)->where('bat_watt','>',0)->first();
+                    if($battery_user2_imp == TRUE){
+                        $kurang_bat2 = $battery_user2_imp->bat_watt + $kurang_bat;
+                        if($kurang_bat2 <= 0){
+                            $update_bat2 = DB::table('battery')->where('id_battery',$battery_user2_imp->id_battery)->update([
+                                'bat_watt' => 0,
+                                'residu_val' => $battery_user2_imp->capacity,
+                            ]);
+
+                            $battery_user3_imp = DB::table('battery')->where('id_users',$id)->where('bat_watt','>',0)->first();
+                            if($battery_user3_imp == TRUE){
+                                $kurang_bat3 = $battery_user3_imp->bat_watt + $kurang_bat2;
+                                if($kurang_bat3 <= 0){
+                                    $update_bat3 = DB::table('battery')->where('id_battery',$battery_user3_imp->id_battery)->update([
+                                        'bat_watt' => 0,
+                                        'residu_val' => $battery_user3_imp->capacity,
+                                    ]);
+
+                                    RecordElecUseModel::create([
+                                        'id_users'  => $id,
+                                        'gen_1'     => $gen_1,
+                                        'gen_2'     => $gen_2,
+                                        'gen_3'     => $gen_3,
+                                        'elec_usage' => $usage,
+                                        'elec_export' => 0,
+                                        'elec_import' => abs($kurang_bat3),
+                                    ]);
+                                }else{
+                                    // Jika Masih Mampu
+                                    $residu_batt_imp3 = $battery_user3_imp->capacity - $kurang_bat3;
+                                    $update_bat3 = DB::table('battery')->where('id_battery',$battery_user3_imp->id_battery)->update([
+                                        'bat_watt' => $kurang_bat3,
+                                        'residu_val' => $residu_batt_imp3,
+                                    ]);
+                                    // Jika Tidak ada battery yang menampung listrik dan harus import
+                                    RecordElecUseModel::create([
+                                        'id_users'  => $id,
+                                        'gen_1'     => $gen_1,
+                                        'gen_2'     => $gen_2,
+                                        'gen_3'     => $gen_3,
+                                        'elec_usage' => $usage,
+                                        'elec_export' => 0,
+                                        'elec_import' => 0,
+                                    ]);
+                                }
+                            }else{
+                                // Jika Tidak ada battery yang menampung listrik dan harus import
+                                RecordElecUseModel::create([
+                                    'id_users'  => $id,
+                                    'gen_1'     => $gen_1,
+                                    'gen_2'     => $gen_2,
+                                    'gen_3'     => $gen_3,
+                                    'elec_usage' => $usage,
+                                    'elec_export' => 0,
+                                    'elec_import' => abs($kurang_bat2),
+                                ]);
+                            }
+
+                        }else{
+                            // Jika Masih Mampu
+                            $residu_batt_imp2 = $battery_user2_imp->capacity - $kurang_bat2;                            
+                            $update_bat2 = DB::table('battery')->where('id_battery',$battery_user2_imp->id_battery)->update([
+                                'bat_watt' => $kurang_bat2,
+                                'residu_val' => $residu_batt_imp2,
+                            ]);
+
+                            RecordElecUseModel::create([
+                                'id_users'  => $id,
+                                'gen_1'     => $gen_1,
+                                'gen_2'     => $gen_2,
+                                'gen_3'     => $gen_3,
+                                'elec_usage' => $usage,
+                                'elec_export' => 0,
+                                'elec_import' => 0,
+                            ]);
+                        }
+                    }else{
+                        // Jika Tidak ada battery yang menampung listrik dan harus import
+                        RecordElecUseModel::create([
+                            'id_users'  => $id,
+                            'gen_1'     => $gen_1,
+                            'gen_2'     => $gen_2,
+                            'gen_3'     => $gen_3,
+                            'elec_usage' => $usage,
+                            'elec_export' => 0,
+                            'elec_import' => abs($kurang_bat),
+                        ]);
+                    }
+
+                }else{
+                    // Jika Listrik Masih Mampu
+                    $residu_batt_imp = $battery_user_imp->capacity - $kurang_bat;
+                    $update_bat = DB::table('battery')->where('id_battery',$battery_user_imp->id_battery)->update([
+                        'bat_watt' => $kurang_bat,
+                        'residu_val' => $residu_batt_imp,
+                    ]);
+
+                    RecordElecUseModel::create([
+                        'id_users'  => $id,
+                        'gen_1'     => $gen_1,
+                        'gen_2'     => $gen_2,
+                        'gen_3'     => $gen_3,
+                        'elec_usage' => $usage,
+                        'elec_export' => 0,
+                        'elec_import' => 0,
+                    ]);
+                }
+
+            }else{
+                // Jika Tidak ada battery yang menampung listrik dan harus import
+                RecordElecUseModel::create([
+                    'id_users'  => $id,
+                    'gen_1'     => $gen_1,
+                    'gen_2'     => $gen_2,
+                    'gen_3'     => $gen_3,
+                    'elec_usage' => $usage,
+                    'elec_export' => 0,
+                    'elec_import' => abs($sum_gen_usage),
+                ]);
+            }
+
+            //redirect to indexs
+            Alert::success('Success!', 'User Created Successfully');
+            return back();
+
+
         }
     }
 }
