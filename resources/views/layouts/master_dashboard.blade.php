@@ -33,6 +33,7 @@
 
     <script src="{{asset('assets/js/jquery.min.js')}}"></script>
     <script src="{{asset('assets/select2/js/select2.min.js')}}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
 
     <!-- <style type="text/css">*{transition: 0.5s ease; scroll-behavior: smooth;}</style> -->
   </head>

@@ -213,20 +213,48 @@
                 </thead>
                 <tbody>
                     @php $no=1; @endphp
-                    @foreach($users as $user)                    
+                    @foreach($users as $user)
+                    <?php
+                        $check_record = DB::table('record_elec_use')->where('id_users',$user->id)->first();
+                        $get_battery = DB::table('battery')->where('id_users',$user->id)->get();
+                        $count_battery = DB::table('battery')->where('id_users',$user->id)->count();
+                        $data_usage = DB::table('record_elec_use')->where('id_users',$user->id)->sum('elec_usage');
+                        $data_export = DB::table('record_elec_use')->where('id_users',$user->id)->sum('elec_export');
+                        $data_import = DB::table('record_elec_use')->where('id_users',$user->id)->sum('elec_import');
+
+                    ?>                    
                     <tr>                        
                         <td>{{$no++}}</td>
                         <td>{{$user->name}}</td>
-                        <td>G1</td>
-                        <td>G2</td>
-                        <td>G3</td>
-                        <td>B1-NameUsers</td>
-                        <td>B2-NameUsers</td>
-                        <td>B3-NameUsers</td>
-                        <td>---</td>
-                        <td>---</td>
-                        <td>---</td>
-                        <td>---</td>
+                        @if($check_record == TRUE)
+                        <td>{{$check_record->gen_1}} Watt</td>
+                        <td>{{$check_record->gen_2}} Watt</td>
+                        <td>{{$check_record->gen_3}} Watt</td>
+                        @else
+                        <td colspan="3">Not Found</td>
+                        @endif                        
+                        @if($count_battery == 3)
+                            @foreach($get_battery as $get_battery)
+                            <td>{{$get_battery->nm_battery}}</td>
+                            @endforeach                        
+                        @elseif($count_battery == 2)
+                            @foreach($get_battery as $get_battery)
+                            <td>{{$get_battery->nm_battery}}</td>
+                            @endforeach  
+                            <td>-</td>
+                        @elseif($count_battery == 1)
+                            @foreach($get_battery as $get_battery)
+                            <td>{{$get_battery->nm_battery}}</td>
+                            @endforeach  
+                            <td>-</td>
+                            <td>-</td>
+                        @else
+                            <td colspan="3">Not Found</td>
+                        @endif                        
+                        <td>{{$data_usage}} Watt</td>
+                        <td>{{$data_export}} Watt</td>
+                        <td>{{$data_import}} Watt</td>
+                        <td>{{$data_usage + $data_export + $data_import}} Watt</td>
                         <td>
                             <form onsubmit="return confirm('Are you sure ?');" action="{{ route('users.destroy', $user->id) }}" method="POST">
                                 <a href="{{route('users.details')}}/{{$user->id}}" class="btn btn-primary"><i class="mdi mdi-home"></i></a>

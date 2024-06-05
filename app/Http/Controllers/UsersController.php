@@ -157,11 +157,11 @@ class UsersController extends Controller
 
     public function rand_watt_home($id){        
         
-        $gen_1 = 0; //Generator 1
+        $gen_1 = 1000; //Generator 1
         $gen_2 = 0; //Generator 2
         $gen_3 = 0; //Generator 3
         
-        $usage = 3100;  //Pemakaian Listrik
+        $usage = 5000;  //Pemakaian Listrik
         $sum_generator = $gen_1 + $gen_2 + $gen_3; //Hitung Listrik dari Generator
         $sum_gen_usage = $sum_generator - $usage; // Jumlah Generator - Pemakaian        
 

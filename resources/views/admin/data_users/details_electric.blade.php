@@ -221,21 +221,36 @@
                 </thead>
                 <tbody> 
                     @php $no=1; @endphp
-                    @foreach($record_data as $record)        
+                    @foreach($record_data as $record)
                     <tr>
                         <td>{{$no++}}</td>
                         <td>{{$record->name}}</td>
                         <td>{{$record->gen_1}} Watt</td>
                         <td>{{$record->gen_2}} Watt</td>
-                        <td>{{$record->gen_3}} Watt</td>                        
-                        @foreach($get_batt as $battery)
-                            <td>{{$battery->bat_watt}} Watt</td>
-                        @endforeach
+                        <td>{{$record->gen_3}} Watt</td>
+                        @if($count_batt == 3)
+                            @foreach($get_batt as $battery)
+                            <td>{{$battery->nm_battery}}</td>
+                            @endforeach                        
+                        @elseif($count_batt == 2)
+                            @foreach($get_batt as $battery)
+                            <td>{{$battery->nm_battery}}</td>
+                            @endforeach  
+                            <td>-</td>
+                        @elseif($count_batt == 1)
+                            @foreach($get_batt as $battery)
+                            <td>{{$battery->nm_battery}}</td>
+                            @endforeach  
+                            <td>-</td>
+                            <td>-</td>
+                        @else
+                            <td>Not Found</td>
+                        @endif
 
                         <td>{{$record->elec_usage}} Watt</td>
                         <td>{{$record->elec_export}} Watt</td>
                         <td>{{$record->elec_import}} Watt</td>
-                        <td>{{($record->gen_1 + $record->gen_2 + $record->gen_3 + $record->elec_import ) - ($record->elec_usage - $record->elec_export)}} Watt</td>
+                        <td>{{($record->gen_1 + $record->gen_2 + $record->gen_3 + $record->elec_import ) + ($record->elec_usage - $record->elec_export)}} Watt</td>
                         <td>{{$record->created_at}}</td>
                     </tr>
                     @endforeach
