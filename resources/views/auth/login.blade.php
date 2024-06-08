@@ -97,7 +97,7 @@
 
                 <div class="row mt-3">
                     <div class="col-12 text-center">
-                        <p class="text-muted">Not account yet? <a href="{{route('register')}}" class="text-muted ms-1"><b>Sign Up</b></a></p> -->
+                        <p class="text-muted">Not account yet? <a href="{{route('register')}}" class="text-muted ms-1"><b>Sign Up</b></a></p>
                     </div> <!-- end col -->
                 </div>
                 <!-- end row -->

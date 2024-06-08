@@ -203,7 +203,7 @@
                     <th>No.</th>
                     <th>Battery</th>
                     <th>Battery Capacity Max</th>
-                    <th>Battery Capacity</th>
+                    <th>Battery</th>
                         <th style="width: 125px;">Action</th>
                     </tr>
                 </thead>

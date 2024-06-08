@@ -94,11 +94,17 @@ class BatteryController extends Controller
 
         $get_battery = BatteryModel::where('id_battery',$id)->first();
 
-        $check_us = BatteryModel::where('id_users',$request->id_users)->first();          
+        $check_us = BatteryModel::where('id_users',$request->id_users)->first();
+        if($request->capacity >= $check_us->capacity){
+            $get_res = $request->capacity - $check_us->bat_watt;
+        }else{
+            $get_res = 0;
+        }
         $get_battery->where('id_battery',$id)->update([   
             'id_users'     => $request->id_users,             
             'nm_battery'   => $request->nm_battery,
             'capacity'   => $request->capacity,
+            'bat_watt'   => $get_res,
             'residu_val'   => $request->capacity,
         ]);
         //redirect to index

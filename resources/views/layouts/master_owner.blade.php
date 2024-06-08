@@ -136,17 +136,7 @@
                             <i class="dripicons-user-group"></i>
                             <span> Users </span>
                           </a>
-                        </li>
-                      
-                      <li class="side-nav-item">
-                        <a
-                          href="{{route('owner.meters')}}"
-                          class="side-nav-link"
-                        >
-                          <i class="dripicons-meter"></i>
-                          <span> Meters </span>
-                        </a>
-                      </li>
+                        </li>                    
 
                       <li class="side-nav-item">
                           <a

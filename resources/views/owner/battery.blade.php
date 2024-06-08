@@ -23,19 +23,23 @@
 <table class="table table-bordered table-hover">
     <thead class="table-light">
         <tr>
-            <th>Battery ID</th>                        
-            <th>Battery Name</th>
-            <th>Battery Capacity</th>            
+        <th>No.</th>
+        <th>Battery</th>
+        <th>Battery Capacity Max</th>
+        <th>Battery</th>            
         </tr>
     </thead>
     <tbody>
         @php $no=1; @endphp
         @foreach($battery as $data)
-        <tr>                                                
-            <td>{{$data->id_battery}}</td>
-            <td>{{$data->nm_battery}}</td>                        
+        <tr>
+            <td>{{$no++}}</td>
+            <td>{{$data->nm_battery}}</td>
             <td>
-                <h5 class="my-0">{{$data->capacity}}</h5>                            
+                <h5 class="my-0">{{$data->capacity}} Watt</h5>                            
+            </td>
+            <td>
+                <h5 class="my-0">{{$data->bat_watt}} Watt</h5>                            
             </td>
         </tr>
         @endforeach
