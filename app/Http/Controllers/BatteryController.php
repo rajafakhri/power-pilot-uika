@@ -124,4 +124,6 @@ class BatteryController extends Controller
         Alert::success('Success!', 'Battery Delete Successfully');
         return redirect()->route('battery.index');
     }
+
+    
 }

@@ -244,6 +244,16 @@
                                                     <option value="3">Users</option>
                                                 </select>
                                             </div>
+                                            
+                                            <div class="mb-3">
+                                                <label for="simpleinput" class="form-label">Saldo</label>
+                                                <input type="number" id="simpleinput" class="form-control @error('saldo') is-invalid @enderror" name="saldo" value="{{old('saldo')}}">
+                                                @error('saldo')
+                                                <span class="invalid-feedback" role="alert">
+                                                    <strong>{{ $message }}</strong>
+                                                </span>
+                                                @enderror
+                                            </div>
 
                                             <button type="submit" id="add-user-b" class="btn btn-primary">Submit</button>
                                         </form>

@@ -34,6 +34,7 @@
                     $check_record = DB::table('record_elec_use')->where('id_users',$user->id)->orderBy('id_rec_elec_use','DESC')->first();
                     $get_battery = DB::table('battery')->where('id_users',$user->id)->get();
                     $count_battery = DB::table('battery')->where('id_users',$user->id)->count();
+                    $sum_batt = DB::table('battery')->where('id_users',$user->id)->sum('bat_watt');
                     $data_usage = DB::table('record_elec_use')->where('id_users',$user->id)->sum('elec_usage');
                     $data_export = DB::table('record_elec_use')->where('id_users',$user->id)->sum('elec_export');
                     $data_import = DB::table('record_elec_use')->where('id_users',$user->id)->sum('elec_import');
@@ -70,7 +71,7 @@
                     <td>{{$data_usage}} Watt</td>
                     <td>{{$data_export}} Watt</td>
                     <td>{{$data_import}} Watt</td>
-                    <td>{{$data_usage + $data_export + $data_import}} Watt</td>
+                    <td>{{$sum_batt}} Watt</td>
                 </tr>
                 @endforeach
 

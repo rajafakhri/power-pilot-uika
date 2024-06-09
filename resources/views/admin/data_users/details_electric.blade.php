@@ -192,6 +192,7 @@
 
         <?php
             $count_batt = DB::table('battery')->where('id_users',$id)->count();
+            $sum_bat = DB::table('battery')->where('id_users',$id)->sum('bat_watt');
             $get_batt = DB::table('battery')->where('id_users',$id)->get();   
             $battery_user_imp = DB::table('battery')->where('id_users',$id)->where('bat_watt','>',0)->first(); //Ambil listrik dari batrai yang punya listrik            
         ?>    
@@ -250,7 +251,7 @@
                         <td>{{$record->elec_usage}} Watt</td>
                         <td>{{$record->elec_export}} Watt</td>
                         <td>{{$record->elec_import}} Watt</td>
-                        <td>{{($record->gen_1 + $record->gen_2 + $record->gen_3 + $record->elec_import ) + ($record->elec_usage - $record->elec_export)}} Watt</td>
+                        <td>{{$sum_bat}} Watt</td>
                         <td>{{$record->created_at}}</td>
                     </tr>
                     @endforeach

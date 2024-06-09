@@ -203,7 +203,7 @@
                     <th>No</th>
                     <th>User</th>
                     <th colspan="3">Generator</th>
-                    <th colspan="3">Battery</th>
+                    <th>Battery</th>
                     <th>Usage</th>
                     <th>Export</th>
                     <th>Import</th>
@@ -218,9 +218,16 @@
                         $check_record = DB::table('record_elec_use')->where('id_users',$user->id)->orderBy('id_rec_elec_use','DESC')->first();
                         $get_battery = DB::table('battery')->where('id_users',$user->id)->get();
                         $count_battery = DB::table('battery')->where('id_users',$user->id)->count();
+                        $sum_batt = DB::table('battery')->where('id_users',$user->id)->sum('bat_watt');
+                        $sum_cap = DB::table('battery')->where('id_users',$user->id)->sum('capacity');
                         $data_usage = DB::table('record_elec_use')->where('id_users',$user->id)->sum('elec_usage');
                         $data_export = DB::table('record_elec_use')->where('id_users',$user->id)->sum('elec_export');
                         $data_import = DB::table('record_elec_use')->where('id_users',$user->id)->sum('elec_import');
+                        if($sum_batt > 0){
+                            $persentase_bat = ($sum_batt / $sum_cap) * 100;
+                        }else{
+                            $persentase_bat = 0;
+                        }
 
                     ?>                    
                     <tr>                        
@@ -232,31 +239,15 @@
                         <td>{{$check_record->gen_3}} Watt</td>
                         @else
                         <td colspan="3">Not Found</td>
-                        @endif                        
-                        @if($count_battery == 3)
-                            @foreach($get_battery as $get_battery)
-                            <td>{{$get_battery->nm_battery}}</td>
-                            @endforeach                        
-                        @elseif($count_battery == 2)
-                            @foreach($get_battery as $get_battery)
-                            <td>{{$get_battery->nm_battery}}</td>
-                            @endforeach  
-                            <td>-</td>
-                        @elseif($count_battery == 1)
-                            @foreach($get_battery as $get_battery)
-                            <td>{{$get_battery->nm_battery}}</td>
-                            @endforeach  
-                            <td>-</td>
-                            <td>-</td>
-                        @else
-                            <td colspan="3">Not Found</td>
-                        @endif                        
+                        @endif                                                
+                        <td>{{$persentase_bat}} %</td>                                              
                         <td>{{$data_usage}} Watt</td>
                         <td>{{$data_export}} Watt</td>
                         <td>{{$data_import}} Watt</td>
-                        <td>{{$data_usage + $data_export + $data_import}} Watt</td>
+                        <td>{{$sum_batt}} Watt</td>
                         <td>
                             <form onsubmit="return confirm('Are you sure ?');" action="{{ route('users.destroy', $user->id) }}" method="POST">
+                                <a href="{{route('users.up_generator')}}/{{$user->id}}" class="btn btn-primary"><i class="dripicons-battery-full"></i></a>
                                 <a href="{{route('users.details')}}/{{$user->id}}" class="btn btn-primary"><i class="mdi mdi-home"></i></a>
                                 <a class="btn btn-primary" href="{{route('users.edit', $user->id)}}" class="action-icon"> <i class="mdi mdi-square-edit-outline"></i></a>                                                        
                                 @csrf

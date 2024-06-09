@@ -41,6 +41,7 @@ class UsersController extends Controller
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required','string','min:8'],
             'level'   => ['required','min:1','max:3'],
+            'saldo' => ['required', 'string', 'min:1'],
         ]);        
 
         //create post
@@ -48,7 +49,7 @@ class UsersController extends Controller
             'name'     => $request->name,
             'email'   => $request->email,
             'password'   => Hash::make($request->password),
-            'level'   => $request->level
+            'saldo'   => $request->saldo,
         ]);
 
         //redirect to index
@@ -83,6 +84,7 @@ class UsersController extends Controller
         $request->validate([            
             'name' => ['required', 'string', 'max:255'],            
             'level'   => ['required','min:1','max:3'],
+            'saldo' => ['required', 'string', 'min:1'],
         ]);   
 
         //get post by ID
@@ -121,13 +123,15 @@ class UsersController extends Controller
                     'name'     => $request->name,
                     'email'   => $request->email,
                     'password'   => Hash::make($request->password),
-                    'level'   => $request->level
+                    'level'   => $request->level,
+                    'saldo'   => $request->saldo,
                 ]);
             }else{                
                 $users->update([
                     'name'     => $request->name,
                     'email'   => $request->email,                    
-                    'level'   => $request->level
+                    'level'   => $request->level,
+                    'saldo'   => $request->saldo,
                 ]);
             }
         }
@@ -155,13 +159,14 @@ class UsersController extends Controller
         return view('admin.data_users.details_electric',compact('record_data','id'));        
     }
 
+    // Proses Salah
     public function rand_watt_home($id){        
         
-        $gen_1 = 400; //Generator 1
+        $gen_1 = 600; //Generator 1
         $gen_2 = 0; //Generator 2
         $gen_3 = 0; //Generator 3
         
-        $usage = 4000;  //Pemakaian Listrik
+        $usage = 400;  //Pemakaian Listrik
         $sum_generator = $gen_1 + $gen_2 + $gen_3; //Hitung Listrik dari Generator
         $sum_gen_usage = $sum_generator - $usage; // Jumlah Generator - Pemakaian        
 
@@ -219,8 +224,8 @@ class UsersController extends Controller
                                     $kelebihan_elec3 = $battery_user3->residu_val - $kelebihan_elec2;
                                     $residu_new3 = $battery_user3->capacity - $kelebihan_elec3;
                                     $update_bat3 = DB::table('battery')->where('id_battery',$battery_user3->id_battery)->update([
-                                        'bat_watt' => $kelebihan_elec3,
-                                        'residu_val' => $residu_new3,
+                                        'bat_watt' => $residu_new3,
+                                        'residu_val' => $kelebihan_elec3,
                                     ]);
                                     // Masih Bisa Mandiri                            
                                     RecordElecUseModel::create([
@@ -257,8 +262,8 @@ class UsersController extends Controller
                             $kelebihan_elec2 = $battery_user2->residu_val - $kelebihan_elec;
                             $residu_new2 = $battery_user2->capacity - $kelebihan_elec2;
                             $update_bat2 = DB::table('battery')->where('id_battery',$battery_user2->id_battery)->update([
-                                'bat_watt' => $kelebihan_elec2,
-                                'residu_val' => $residu_new2,
+                                'bat_watt' => $residu_new2,
+                                'residu_val' => $kelebihan_elec2,
                             ]);
                             // Masih Bisa Mandiri                            
                             RecordElecUseModel::create([
@@ -475,5 +480,46 @@ class UsersController extends Controller
 
 
         }
+    }
+    // End Proses Salah
+
+    public function up_generator($id){
+        $gen_1 = 2000; //Generator 1
+        $gen_2 = 0; //Generator 2
+        $gen_3 = 0; //Generator 3
+        
+        $total_gen = $gen_1 + $gen_2 + $gen_3;                        
+        $battery_user = DB::table('battery')->where('id_users',$id)->where('residu_val','>',0)->get();
+        if($battery_user == TRUE){
+            foreach($battery_user as $battery){            
+                if($total_gen >= $battery->residu_val){
+                    $total_gen -= $battery->residu_val;
+                    if($total_gen >= 0){
+                        $up_data = DB::table('battery')->where('id_users',$id)->where('id_battery',$battery->id_battery)->update([
+                            'bat_watt' => $battery->capacity,
+                            'residu_val' => 0,
+                        ]);
+                    }
+                }else{
+                    if($total_gen > 0){                    
+                        $sum_residu = $battery->capacity - $total_gen;
+                        $up_data = DB::table('battery')->where('id_users',$id)->where('id_battery',$battery->id_battery)->update([
+                            'bat_watt' => $total_gen,                    
+                            'residu_val' => $sum_residu,                    
+                            ]);
+                        $total_gen -= $battery->residu_val;
+                    }
+                }
+            }
+
+            //redirect to indexs
+            Alert::success('Success!', 'Battery is Fully Charged');
+            return back();
+        }else{
+            // Tidak Punya Battery
+            Alert::error('Error!', 'User Has No Battery');
+            return back();
+        }
+        
     }
 }

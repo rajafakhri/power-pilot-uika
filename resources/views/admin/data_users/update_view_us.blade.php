@@ -238,6 +238,16 @@
                                             </div>
 
                                             <div class="mb-3">
+                                                <label for="simpleinput" class="form-label">Saldo</label>
+                                                <input type="text" id="simpleinput" class="form-control @error('saldo') is-invalid @enderror" name="saldo" value="{{ old('saldo', $get_user->saldo) }}">
+                                                @error('saldo')
+                                                <span class="invalid-feedback" role="alert">
+                                                    <strong>{{ $message }}</strong>
+                                                </span>
+                                                @enderror
+                                            </div>
+
+                                            <div class="mb-3">
                                                 <label for="example-select" class="form-label">Level</label>
                                                 <select class="form-select" id="example-select" name="level">
                                                 <option value="1" <?php if(old('level', $get_user->level) == 1){ echo "Selected";} ?>>Admin</option>
