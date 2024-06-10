@@ -23,6 +23,7 @@
 
     <!-- App css -->
     <link href="{{asset('assets/css/icons.min.css')}}" rel="stylesheet" type="text/css" />
+    <link href="{{asset('assets/datatables/css/datatables.css')}}" rel="stylesheet" type="text/css" />
     <link
       href="{{asset('assets/css/app.min.css')}}"
       rel="stylesheet"
@@ -34,6 +35,8 @@
     <script src="{{asset('assets/js/jquery.min.js')}}"></script>
     <script src="{{asset('assets/select2/js/select2.min.js')}}"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+    <script src="{{asset('assets/datatables/js/datatables.js')}}"></script>
+
 
     <!-- <style type="text/css">*{transition: 0.5s ease; scroll-behavior: smooth;}</style> -->
   </head>

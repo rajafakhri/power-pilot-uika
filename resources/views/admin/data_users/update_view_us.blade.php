@@ -251,7 +251,7 @@
                                                 <label for="example-select" class="form-label">Level</label>
                                                 <select class="form-select" id="example-select" name="level">
                                                 <option value="1" <?php if(old('level', $get_user->level) == 1){ echo "Selected";} ?>>Admin</option>
-                                                <option value="2" <?php if(old('level', $get_user->level) == 2){ echo "Selected";} ?>>Reseller</option>
+                                                <option value="2" <?php if(old('level', $get_user->level) == 2){ echo "Selected";} ?>>Owner</option>
                                                 <option value="3" <?php if(old('level', $get_user->level) == 3){ echo "Selected";} ?>>Users</option>
                                                 </select>
                                             </div>

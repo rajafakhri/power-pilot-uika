@@ -484,15 +484,16 @@ class UsersController extends Controller
     // End Proses Salah
 
     public function up_generator($id){
-        $gen_1 = 2000; //Generator 1
-        $gen_2 = 0; //Generator 2
-        $gen_3 = 0; //Generator 3
+        $gen_1 = 5000; //Generator 1
+        $gen_2 = 5000; //Generator 2
+        $gen_3 = 5000; //Generator 3
         
         $total_gen = $gen_1 + $gen_2 + $gen_3;                        
         $battery_user = DB::table('battery')->where('id_users',$id)->where('residu_val','>',0)->get();
         if($battery_user == TRUE){
             foreach($battery_user as $battery){            
                 if($total_gen >= $battery->residu_val){
+                    // Jika Lebih dari Capasitas yang bisa ditampung
                     $total_gen -= $battery->residu_val;
                     if($total_gen >= 0){
                         $up_data = DB::table('battery')->where('id_users',$id)->where('id_battery',$battery->id_battery)->update([
@@ -501,6 +502,7 @@ class UsersController extends Controller
                         ]);
                     }
                 }else{
+                    // Jika sudah masih ada sisa listrik namun masih bisa ditampung
                     if($total_gen > 0){                    
                         $sum_residu = $battery->capacity - $total_gen;
                         $up_data = DB::table('battery')->where('id_users',$id)->where('id_battery',$battery->id_battery)->update([
@@ -512,6 +514,15 @@ class UsersController extends Controller
                 }
             }
 
+
+            $get_sum_battery = DB::table('battery')->where('id_users',$id)->sum('bat_watt'); //Listrik dari battery (Watt)
+            $sum_cap = DB::table('battery')->where('id_users',$id)->sum('capacity');
+            $persentase_bat = ($get_sum_battery / $sum_cap) * 100; //Hitung Persentase
+
+            $up_us_persen = DB::table('users')->where('id',$id)->update([
+                'persentase' => $persentase_bat,
+            ]);
+
             //redirect to indexs
             Alert::success('Success!', 'Battery is Fully Charged');
             return back();
@@ -520,6 +531,133 @@ class UsersController extends Controller
             Alert::error('Error!', 'User Has No Battery');
             return back();
         }
+        
+    }
+
+    public function electric_export($id){
+        $usage = 2000; //Pemakaian (Watt)
+        $get_sum_battery = DB::table('battery')->where('id_users',$id)->sum('bat_watt'); //Listrik dari battery (Watt)
+        $sum_cap = DB::table('battery')->where('id_users',$id)->sum('capacity');
+        $get_data_battery = DB::table('battery')->where('id_users',$id)->orderBy('bat_watt','ASC')->get();
+        
+        $persentase_bat = ($get_sum_battery / $sum_cap) * 100; //Hitung Persentase
+        $val_export = (50 / 100) * $sum_cap; //Ambil Jumlah Watt battery 50 %
+        $sum_export = $get_sum_battery - $usage - $val_export; //Hitung Kebutuhan dulu
+        
+        $battery_user = DB::table('battery')->join('users','users.id','battery.id_users')
+        ->where('id_users','!=',$id)->where('residu_val','>',0)->where('persentase','<',30)->get(); //Cari User yang Batterynya kurang dari 30 dan memiliki battery
+        
+        $sum_ex_utm = $sum_export + $usage;        
+
+        // Ambil Battery Utama Users (Ini Battery yang Export)        
+        if($battery_user == TRUE){
+            foreach($battery_user as $battery){
+                if($sum_export >= $battery->residu_val){
+                    // Jika Lebih dari Capasitas yang bisa ditampung
+                    $sum_export -= $battery->residu_val;
+                    if($sum_export >= 0){
+                        $up_data = DB::table('battery')->where('id_users',$battery->id_users)->where('id_battery',$battery->id_battery)->update([
+                            'bat_watt' => $battery->capacity,
+                            'residu_val' => 0,
+                        ]);
+
+                        $get_sum_battery_ex = DB::table('battery')->where('id_users',$battery->id_users)->sum('bat_watt'); //Listrik dari battery (Watt)
+                        $sum_cap_ex = DB::table('battery')->where('id_users',$battery->id_users)->sum('capacity');
+                        $persentase_bat_ex = ($get_sum_battery_ex / $sum_cap_ex) * 100; //Hitung Persentase
+
+                        $up_us_persen_ex = DB::table('users')->where('id',$battery->id_users)->update([
+                            'persentase' => $persentase_bat_ex,
+                        ]);
+
+                        RecordElecUseModel::create([
+                            'id_users'  => $id,
+                            'gen_1'     => 0,
+                            'gen_2'     => 0,
+                            'gen_3'     => 0,
+                            'elec_usage' => $usage,
+                            'elec_export' => $sum_export,
+                            'elec_import' => 0,
+                            'export_to' => $battery->id_users,
+                        ]);
+                    }
+                }else{
+                    // Jika sudah masih ada sisa listrik namun masih bisa ditampung
+                    if($sum_export > 0){                    
+                        $sum_residu = $battery->capacity - $sum_export;
+                        $up_data = DB::table('battery')->where('id_users',$battery->id_users)->where('id_battery',$battery->id_battery)->update([
+                            'bat_watt' => $sum_export,                    
+                            'residu_val' => $sum_residu,                    
+                            ]);
+
+                            $get_sum_battery_ex = DB::table('battery')->where('id_users',$battery->id_users)->sum('bat_watt'); //Listrik dari battery (Watt)
+                            $sum_cap_ex = DB::table('battery')->where('id_users',$battery->id_users)->sum('capacity');
+                            $persentase_bat_ex = ($get_sum_battery_ex / $sum_cap_ex) * 100; //Hitung Persentase
+
+                            $up_us_persen_ex = DB::table('users')->where('id',$battery->id_users)->update([
+                                'persentase' => $persentase_bat_ex,
+                            ]);
+
+                            RecordElecUseModel::create([
+                                'id_users'  => $id,
+                                'gen_1'     => 0,
+                                'gen_2'     => 0,
+                                'gen_3'     => 0,
+                                'elec_usage' => $usage,
+                                'elec_export' => $sum_export,
+                                'elec_import' => 0,
+                                'export_to' => $battery->id_users,
+                            ]);
+                        $sum_export -= $battery->residu_val;
+                    }
+                }
+            }
+
+            
+            foreach($get_data_battery as $battery_utm){
+                if($sum_ex_utm >= $battery_utm->bat_watt){
+                    // Jika Lebih dari Capasitas yang bisa ditampung
+                    $sum_ex_utm -= $battery_utm->bat_watt;
+                    if($sum_ex_utm >= 0){
+                        $up_data = DB::table('battery')->where('id_users',$id)->where('id_battery',$battery_utm->id_battery)->update([
+                            'bat_watt' => 0,
+                            'residu_val' => $battery_utm->capacity,
+                        ]);
+                    }
+                }else{
+                    // Jika sudah masih ada sisa listrik namun masih bisa ditampung
+                    if($sum_ex_utm > 0){                    
+                        $sum_bat_utm = $battery_utm->bat_watt - $sum_ex_utm;
+                        $res_awal = $sum_ex_utm + $battery_utm->residu_val;
+                        $up_data = DB::table('battery')->where('id_users',$id)->where('id_battery',$battery_utm->id_battery)->update([
+                            'bat_watt' => $sum_bat_utm,                    
+                            'residu_val' => $res_awal,
+                            ]);
+                        $sum_ex_utm -= $battery_utm->bat_watt;
+                    }
+                }
+            }
+
+            // Utama
+            $get_sum_battery_utm = DB::table('battery')->where('id_users',$id)->sum('bat_watt'); //Listrik dari battery (Watt)
+            $sum_cap_utm = DB::table('battery')->where('id_users',$id)->sum('capacity');
+            $persentase_bat_utm = ($get_sum_battery_utm / $sum_cap_utm) * 100; //Hitung Persentase
+
+            $up_us_persen = DB::table('users')->where('id',$id)->update([
+                'persentase' => $persentase_bat_utm,
+            ]);
+
+            //redirect to indexs
+            Alert::success('Success!', 'Battery is Fully Charged');
+            return back();
+        }else{
+            // Tidak Punya Battery
+            Alert::error('Error!', 'User Has No Battery');
+            return back();
+        }
+
+    }
+
+    public function electric_import($id){
         
     }
 }

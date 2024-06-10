@@ -194,7 +194,13 @@
         <br>
         <!-- end page title -->
 
-
+        <?php
+            $persen = (16000 / 30000) * 100;
+            $change_elec = (50 / 100) * 30000;
+            
+        ?>
+        {{$persen}}%
+        {{$change_elec}}
         <!-- KAMUS -->
         <div class="table-responsive">
             <table class="table table-centered table-nowrap mb-0">
@@ -219,15 +225,16 @@
                         $get_battery = DB::table('battery')->where('id_users',$user->id)->get();
                         $count_battery = DB::table('battery')->where('id_users',$user->id)->count();
                         $sum_batt = DB::table('battery')->where('id_users',$user->id)->sum('bat_watt');
-                        $sum_cap = DB::table('battery')->where('id_users',$user->id)->sum('capacity');
+                        // $sum_cap = DB::table('battery')->where('id_users',$user->id)->sum('capacity');
                         $data_usage = DB::table('record_elec_use')->where('id_users',$user->id)->sum('elec_usage');
                         $data_export = DB::table('record_elec_use')->where('id_users',$user->id)->sum('elec_export');
                         $data_import = DB::table('record_elec_use')->where('id_users',$user->id)->sum('elec_import');
-                        if($sum_batt > 0){
-                            $persentase_bat = ($sum_batt / $sum_cap) * 100;
-                        }else{
-                            $persentase_bat = 0;
-                        }
+                        // if($sum_batt > 0){
+                        //     $persentase_bat = ($sum_batt / $sum_cap) * 100;
+                        // }else{
+                        //     $persentase_bat = 0;
+                        // }
+                        
 
                     ?>                    
                     <tr>                        
@@ -240,7 +247,7 @@
                         @else
                         <td colspan="3">Not Found</td>
                         @endif                                                
-                        <td>{{$persentase_bat}} %</td>                                              
+                        <td>{{$user->persentase}} %</td>                                              
                         <td>{{$data_usage}} Watt</td>
                         <td>{{$data_export}} Watt</td>
                         <td>{{$data_import}} Watt</td>
@@ -248,6 +255,11 @@
                         <td>
                             <form onsubmit="return confirm('Are you sure ?');" action="{{ route('users.destroy', $user->id) }}" method="POST">
                                 <a href="{{route('users.up_generator')}}/{{$user->id}}" class="btn btn-primary"><i class="dripicons-battery-full"></i></a>
+                                @if($user->persentase > 50)
+                                <a href="{{route('users.export')}}/{{$user->id}}" class="btn btn-primary"><i class="dripicons-export"></i></a>
+                                @else
+                                <a href="{{route('users.import')}}/{{$user->id}}" class="btn btn-primary"><i class="dripicons-export"></i></a>
+                                @endif
                                 <a href="{{route('users.details')}}/{{$user->id}}" class="btn btn-primary"><i class="mdi mdi-home"></i></a>
                                 <a class="btn btn-primary" href="{{route('users.edit', $user->id)}}" class="action-icon"> <i class="mdi mdi-square-edit-outline"></i></a>                                                        
                                 @csrf

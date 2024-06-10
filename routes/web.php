@@ -46,6 +46,8 @@ Route::middleware('auth','admin')->group(function () {
     Route::get('/users/details/{id?}', [UsersController::class, 'details_meters'])->name('users.details');
     Route::get('/users/details/random/{id?}', [UsersController::class, 'rand_watt_home'])->name('users.details.random');
     Route::get('/users/update/generator/{id?}', [UsersController::class, 'up_generator'])->name('users.up_generator');
+    Route::get('/users/export/{id?}', [UsersController::class, 'electric_export'])->name('users.export');
+    Route::get('/users/import/{id?}', [UsersController::class, 'electric_import'])->name('users.import');
 
 });
 

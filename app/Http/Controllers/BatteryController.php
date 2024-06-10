@@ -16,7 +16,7 @@ class BatteryController extends Controller
      */
     public function index()
     {
-        $battery = BatteryModel::latest()->paginate(5);        
+        $battery = BatteryModel::latest()->get();        
         return view('admin.battery.battery_view',compact('battery'));
     }
 
@@ -84,7 +84,7 @@ class BatteryController extends Controller
      * Update the specified resource in storage.
      */
     public function update(Request $request, string $id)
-    {
+    {        
         //validate form
         $request->validate([                        
             'id_users' => ['required', 'integer'],
@@ -94,9 +94,13 @@ class BatteryController extends Controller
 
         $get_battery = BatteryModel::where('id_battery',$id)->first();
 
-        $check_us = BatteryModel::where('id_users',$request->id_users)->first();
-        if($request->capacity >= $check_us->capacity){
-            $get_res = $request->capacity - $check_us->bat_watt;
+        $check_us = BatteryModel::where('id_users',$request->id_users)->where('id_battery',$id)->first();
+        if($check_us == TRUE){            
+            if($request->capacity == $check_us->capacity){
+                $get_res = $check_us->bat_watt;
+            }else{
+                $get_res = 0;
+            }
         }else{
             $get_res = 0;
         }

@@ -197,11 +197,12 @@
 
         <!-- KAMUS -->
         <div class="table-responsive">
-            <table class="table table-centered table-nowrap mb-0">
+            <table class="table table-centered table-nowrap mb-0" id="dataBattery">
                 <thead class="table-light">
                     <tr>
                     <th>No.</th>
                     <th>Battery</th>
+                    <th>User</th>
                     <th>Battery Capacity Max</th>
                     <th>Battery</th>
                         <th style="width: 125px;">Action</th>
@@ -209,10 +210,14 @@
                 </thead>
                 <tbody>
                     @php $no=1; @endphp
-                    @foreach($battery as $data)
+                    @foreach($battery as $data)        
+                    <?php
+                        $data_user = DB::table('users')->where('id',$data->id_users)->first();
+                    ?>            
                     <tr>
                         <td>{{$no++}}</td>
                         <td>{{$data->nm_battery}}</td>
+                        <td>{{$data_user->name}}</td>
                         <td>
                             <h5 class="my-0">{{$data->capacity}} Watt</h5>                            
                         </td>
@@ -229,9 +234,8 @@
                         </td>
                     </tr>
                     @endforeach
-
-                </tbody>
-            </table>
+                    </tbody>
+                    </table>                
         </div>
     </div> <!-- end card-body-->
     </div> <!-- end card-->
@@ -243,4 +247,7 @@
     </div>
     <!-- content -->
 </div>
+<script>
+    new DataTable('#dataBattery');
+</script>
 @endsection
