@@ -193,14 +193,6 @@
         </div>
         <br>
         <!-- end page title -->
-
-        <?php
-            $persen = (16000 / 30000) * 100;
-            $change_elec = (50 / 100) * 30000;
-            
-        ?>
-        {{$persen}}%
-        {{$change_elec}}
         <!-- KAMUS -->
         <div class="table-responsive">
             <table class="table table-centered table-nowrap mb-0">
@@ -241,13 +233,6 @@
                             ->get();
 
                     ?>      
-                    @if($battery_user == TRUE)
-                    @foreach($battery_user as $batt)
-                    {{$batt->name}}
-                    @endforeach
-                    @else
-                    False
-                    @endif
                     <tr>                        
                         <td>{{$no++}}</td>
                         <td>{{$user->name}}</td>
