@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jun 05, 2024 at 01:45 PM
+-- Generation Time: Jun 11, 2024 at 05:48 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -43,9 +43,12 @@ CREATE TABLE `battery` (
 --
 
 INSERT INTO `battery` (`id_battery`, `id_users`, `nm_battery`, `capacity`, `bat_watt`, `residu_val`, `created_at`, `updated_at`) VALUES
-(1, 2, 'Batrai AG', 1000, 0, 1000, '2024-05-04 00:29:02', '2024-05-30 21:52:24'),
-(2, 2, 'Batrai A', 1000, 0, 1000, '2024-05-04 03:14:54', '2024-05-30 20:55:31'),
-(3, 2, 'Batrai A3', 1000, 0, 1000, '2024-05-31 16:21:21', '2024-05-31 16:21:21');
+(1, 6, 'Baterry 1', 10000, 0, 10000, '2024-05-04 00:29:02', '2024-06-09 23:43:35'),
+(2, 6, 'Battery 2', 10000, 5000, 5000, '2024-05-04 03:14:54', '2024-06-09 23:46:09'),
+(3, 6, 'Battery 3', 10000, 10000, 0, '2024-05-31 16:21:21', '2024-06-09 23:42:53'),
+(4, 7, 'Battery 1', 10000, 1000, 9000, '2024-06-09 23:47:23', '2024-06-09 23:47:23'),
+(5, 7, 'Battery 2', 10000, 0, 10000, '2024-06-09 23:47:43', '2024-06-09 23:47:43'),
+(6, 7, 'Battery 3', 10000, 0, 10000, '2024-06-09 23:48:04', '2024-06-09 23:48:04');
 
 -- --------------------------------------------------------
 
@@ -174,9 +177,38 @@ CREATE TABLE `record_elec_use` (
   `elec_usage` int(11) NOT NULL DEFAULT 0,
   `elec_export` int(11) NOT NULL DEFAULT 0,
   `elec_import` int(11) NOT NULL DEFAULT 0,
+  `export_to` bigint(20) DEFAULT NULL,
+  `import_to` bigint(20) DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `record_elec_use`
+--
+
+INSERT INTO `record_elec_use` (`id_rec_elec_use`, `id_users`, `gen_1`, `gen_2`, `gen_3`, `elec_usage`, `elec_export`, `elec_import`, `export_to`, `import_to`, `created_at`, `updated_at`) VALUES
+(97, 2, 1000, 1000, 1000, 400, 0, 0, NULL, NULL, '2024-06-08 18:39:18', '2024-06-08 18:39:18'),
+(98, 2, 600, 0, 0, 400, 400, 0, NULL, NULL, '2024-06-08 18:40:14', '2024-06-08 18:40:14'),
+(99, 6, 0, 0, 0, 2000, 1000, 0, NULL, NULL, '2024-06-10 00:33:53', '2024-06-10 00:33:53'),
+(100, 6, 0, 0, 0, 2000, 1000, 0, NULL, NULL, '2024-06-10 00:48:42', '2024-06-10 00:48:42'),
+(101, 6, 0, 0, 0, 2000, 1000, 0, NULL, NULL, '2024-06-10 00:49:46', '2024-06-10 00:49:46'),
+(102, 6, 0, 0, 0, 2000, 1000, 0, NULL, NULL, '2024-06-10 00:55:55', '2024-06-10 00:55:55'),
+(103, 6, 0, 0, 0, 2000, 1000, 0, NULL, NULL, '2024-06-10 00:57:55', '2024-06-10 00:57:55'),
+(104, 6, 0, 0, 0, 2000, 1000, 0, NULL, NULL, '2024-06-10 00:58:52', '2024-06-10 00:58:52'),
+(105, 6, 0, 0, 0, 2000, 1000, 0, NULL, NULL, '2024-06-10 01:02:26', '2024-06-10 01:02:26'),
+(106, 6, 0, 0, 0, 2000, 1000, 0, NULL, NULL, '2024-06-10 01:03:32', '2024-06-10 01:03:32'),
+(107, 6, 0, 0, 0, 2000, 4000, 0, NULL, NULL, '2024-06-10 01:06:04', '2024-06-10 01:06:04'),
+(108, 6, 0, 0, 0, 2000, 4000, 0, NULL, NULL, '2024-06-10 01:06:04', '2024-06-10 01:06:04'),
+(109, 6, 0, 0, 0, 2000, 1000, 0, NULL, NULL, '2024-06-10 01:09:22', '2024-06-10 01:09:22'),
+(110, 6, 0, 0, 0, 2000, 1000, 0, NULL, NULL, '2024-06-10 01:10:24', '2024-06-10 01:10:24'),
+(111, 6, 0, 0, 0, 2000, 1000, 0, NULL, NULL, '2024-06-10 01:12:27', '2024-06-10 01:12:27'),
+(112, 6, 0, 0, 0, 2000, 1000, 0, NULL, NULL, '2024-06-10 01:13:03', '2024-06-10 01:13:03'),
+(113, 6, 0, 0, 0, 2000, 4000, 0, NULL, NULL, '2024-06-10 01:13:16', '2024-06-10 01:13:16'),
+(114, 6, 0, 0, 0, 2000, 4000, 0, NULL, NULL, '2024-06-10 01:13:16', '2024-06-10 01:13:16'),
+(115, 6, 0, 0, 0, 2000, 1000, 0, NULL, NULL, '2024-06-10 01:33:09', '2024-06-10 01:33:09'),
+(116, 6, 0, 0, 0, 2000, 1000, 0, NULL, NULL, '2024-06-10 19:45:59', '2024-06-10 19:45:59'),
+(117, 6, 0, 0, 0, 2000, 1000, 0, NULL, NULL, '2024-06-10 20:34:10', '2024-06-10 20:34:10');
 
 -- --------------------------------------------------------
 
@@ -192,6 +224,8 @@ CREATE TABLE `users` (
   `email_verified_at` timestamp NULL DEFAULT NULL,
   `password` varchar(255) NOT NULL,
   `remember_token` varchar(100) DEFAULT NULL,
+  `saldo` int(11) NOT NULL DEFAULT 0,
+  `persentase` float NOT NULL DEFAULT 0,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -200,10 +234,11 @@ CREATE TABLE `users` (
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `level`, `name`, `email`, `email_verified_at`, `password`, `remember_token`, `created_at`, `updated_at`) VALUES
-(2, 1, 'Mohamad Raja Fakhri', 'rajafakhrir7@gmail.com', NULL, '$2y$10$8EKT0TbgFEgYFNAW0bnh7uyOksfwFhYhnV8OAHz6QXDaauFvbUV1i', '1BW0RyDPg4gFi3Po0FC279O4mvAsoVH3C1VQR2lQA29inywibTqU3vScDkRo', '2024-04-13 23:04:16', '2024-05-02 04:57:01'),
-(4, 2, 'Raja', 'rajafakhrir@yahoo.co.id', NULL, '$2y$10$CI6RlLv3VCXnjDkTPvOVC.QiUyx5j0NQe3Bz6ZG9/5glhUFzKrnvW', NULL, '2024-04-24 06:29:51', '2024-04-24 06:29:51'),
-(6, 1, 'Raja', 'raja1@triwala.co.id', NULL, '$2y$10$jG/C6tc0ByNs7H.rym8/HeH8KXKvZNWEOasxtWl.Bc88pUlVW5h9m', NULL, '2024-05-15 06:26:06', '2024-05-15 06:26:06');
+INSERT INTO `users` (`id`, `level`, `name`, `email`, `email_verified_at`, `password`, `remember_token`, `saldo`, `persentase`, `created_at`, `updated_at`) VALUES
+(2, 1, 'Mohamad Raja Fakhri (Admin)', 'rajafakhrir7@gmail.com', NULL, '$2y$10$8EKT0TbgFEgYFNAW0bnh7uyOksfwFhYhnV8OAHz6QXDaauFvbUV1i', '5rLFfrN7pGb0s9KnvuWCY9O4QokZyMj1KnfnytRfIlj4MnElO5DXfYLH5Gtu', 0, 0, '2024-04-13 23:04:16', '2024-06-09 23:38:16'),
+(4, 2, 'Budi (Owner)', 'rajafakhrir@yahoo.co.id', NULL, '$2y$10$CI6RlLv3VCXnjDkTPvOVC.QiUyx5j0NQe3Bz6ZG9/5glhUFzKrnvW', NULL, 0, 0, '2024-04-24 06:29:51', '2024-06-09 23:37:54'),
+(6, 3, 'Rendi (User)', 'raja1@triwala.co.id', NULL, '$2y$10$jG/C6tc0ByNs7H.rym8/HeH8KXKvZNWEOasxtWl.Bc88pUlVW5h9m', NULL, 1000, 50, '2024-05-15 06:26:06', '2024-06-09 23:38:58'),
+(7, 3, 'Doni (User)', 'doni@gmail.com', NULL, '$2y$10$joRVk4moWRSZBPc08hhSUeczaJDNTloXDHCqLwGZvX9IwlJn4WB1K', NULL, 99000, 3.33333, '2024-06-09 23:46:53', '2024-06-09 23:46:53');
 
 --
 -- Indexes for dumped tables
@@ -280,7 +315,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `battery`
 --
 ALTER TABLE `battery`
-  MODIFY `id_battery` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id_battery` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `failed_jobs`
@@ -316,13 +351,13 @@ ALTER TABLE `personal_access_tokens`
 -- AUTO_INCREMENT for table `record_elec_use`
 --
 ALTER TABLE `record_elec_use`
-  MODIFY `id_rec_elec_use` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=90;
+  MODIFY `id_rec_elec_use` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=118;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- Constraints for dumped tables
