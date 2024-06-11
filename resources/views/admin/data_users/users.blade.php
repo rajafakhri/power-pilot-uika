@@ -235,8 +235,19 @@
                         //     $persentase_bat = 0;
                         // }
                         
+                        $battery_user = DB::table('battery')->join('users','users.id','battery.id_users')
+                            ->where('id_users','!=',6)->where('residu_val','>',0)->where('persentase','<',30)
+                            ->groupBy('id_users')
+                            ->get();
 
-                    ?>                    
+                    ?>      
+                    @if($battery_user == TRUE)
+                    @foreach($battery_user as $batt)
+                    {{$batt->name}}
+                    @endforeach
+                    @else
+                    False
+                    @endif
                     <tr>                        
                         <td>{{$no++}}</td>
                         <td>{{$user->name}}</td>
