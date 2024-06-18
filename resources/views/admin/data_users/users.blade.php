@@ -253,11 +253,49 @@
                                 <a href="{{route('users.up_generator')}}/{{$user->id}}" class="btn btn-primary"><i class="dripicons-battery-full"></i></a>
                                 @if($user->persentase > 50)
                                 <a href="{{route('users.export')}}/{{$user->id}}" class="btn btn-primary"><i class="dripicons-export"></i></a>
-                                @else
-                                <a href="{{route('users.import')}}/{{$user->id}}" class="btn btn-primary"><i class="dripicons-export"></i></a>
+                                @elseif($user->persentase == 0)
+                                <a href="{{route('users.import')}}/{{$user->id}}" class="btn btn-danger"><i class="dripicons-battery-low"></i></a>
                                 @endif
                                 <a href="{{route('users.details')}}/{{$user->id}}" class="btn btn-primary"><i class="mdi mdi-home"></i></a>
                                 <a class="btn btn-primary" href="{{route('users.edit', $user->id)}}" class="action-icon"> <i class="mdi mdi-square-edit-outline"></i></a>                                                        
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-danger" class=""> <i class="mdi mdi-delete"></i></button>
+                            </form>
+                        </td>
+                    </tr>
+                    @endforeach
+
+                </tbody>
+            </table>
+        </div>
+
+        <br>
+        <h3>Users Manager</h3>
+        <div class="table-responsive">
+            <table class="table table-centered table-nowrap mb-0">
+                <thead class="table-light">
+                    <tr>
+                    <th>No</th>
+                    <th>Name</th>
+                    <th>Role</th>
+                    <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @php $no_adm=1; @endphp
+                    @foreach($users_adm as $us_adm)    
+                    <tr>                        
+                        <td>{{$no_adm++}}</td>
+                        <td>{{$us_adm->name}}</td>
+                        @if($us_adm->level == 1)
+                        <td>Admin</td>
+                        @elseif($us_adm->level == 2)
+                        <td>Owner</td>
+                        @endif
+                        <td>
+                            <form onsubmit="return confirm('Are you sure ?');" action="{{ route('users.destroy', $us_adm->id) }}" method="POST">                                                                
+                                <a class="btn btn-primary" href="{{route('users.edit', $us_adm->id)}}" class="action-icon"> <i class="mdi mdi-square-edit-outline"></i></a>                                                        
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="btn btn-danger" class=""> <i class="mdi mdi-delete"></i></button>

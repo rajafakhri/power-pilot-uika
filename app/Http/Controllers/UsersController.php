@@ -18,8 +18,9 @@ class UsersController extends Controller
      */
     public function index()
     {
-        $users = User::latest()->paginate(5);        
-        return view('admin.data_users.users',compact('users'));
+        $users = User::latest()->where('level',3)->get();
+        $users_adm = User::latest()->where('level',1)->orWhere('level',2)->get();
+        return view('admin.data_users.users',compact('users','users_adm'));
     }
 
     /**
@@ -706,6 +707,125 @@ class UsersController extends Controller
     }
 
     public function electric_import($id){
-        
+        // Import jika nilai battery nya 0 
+        // Import jika Users Memiliki Saldo
+        // Berarti Pemakaian - Import dan Import ini diambil dari berbagai users    
+
+        // $sum_batt = DB::table('battery')->where('id_users',$id)->sum('bat_watt');
+
+        $cek_saldo = DB::table('users')->where('id',$id)->where('saldo','>',0)->first();
+        if($cek_saldo == TRUE){            
+            $user_imp = DB::table('users')->where('id','!=',$id)->where('persentase','>',50)->get();
+            if($user_imp == TRUE){ //Cek User yang battery nya lebih dari 50 %
+                foreach($user_imp as $us_import){                                        
+                    // Hitung berapa mampunya user ini mengimport listrik
+                    $total_import_accept = $us_import->persentase - 50; //Hitung Berapa Persen bisa import
+                    $sum_cap = DB::table('battery')->where('id_users',$us_import->id)->sum('capacity'); // Hitung Kapasitas User untuk mendapatkan listrik dibattery user import
+                    $persentase_to_elect = ($total_import_accept / 100) * $sum_cap; //Ambil Jumlah Watt battery dari users yang bisa diimport
+                    $get_bat_us_imp = DB::table('battery')->where('id_users',$us_import->id)->where('bat_watt','>',0)->get(); //Data Battery Orang lain
+                    foreach($get_bat_us_imp as $bat_import){
+                        $recheck_saldo = DB::table('users')->where('id',$id)->first();                                    
+                        $data_saldo = $recheck_saldo->saldo;                        
+                        if($data_saldo > 0){
+                            // Jika Saldo Lebih besar dari Listrik yang diimport
+                            if($data_saldo >= $persentase_to_elect){
+                                $import_to_user = DB::table('battery')->where('id_users',$id)->where('residu_val','>',0)->first();
+                                if($import_to_user == TRUE AND $persentase_to_elect >= $import_to_user->residu_val){
+                                    $update_imp_1 = DB::table('battery')->where('id_users',$import_to_user->id_users)
+                                    ->where('id_battery',$import_to_user->id_battery)
+                                    ->update([
+                                        'bat_watt' => $import_to_user->residu_val,
+                                        'residu_val' => $import_to_user->capacity - $import_to_user->residu_val,
+                                    ]);
+
+                                    $sum_bat_up = DB::table('battery')->where('id_users',$import_to_user->id_users)->sum('bat_watt');
+                                    $sum_cap_up = DB::table('battery')->where('id_users',$import_to_user->id_users)->sum('capacity');
+                                    $get_persentase_new = ($sum_bat_up / $sum_cap_up) * 100;
+                                    
+                                    $saldo_new = $data_saldo - $import_to_user->residu_val;
+
+                                    $up_to_us = DB::table('users')->where('id',$import_to_user->id_users)->update([
+                                        'persentase' => $get_persentase_new,
+                                        'saldo' => $saldo_new,
+                                    ]);
+
+                                    // User yang Saldonya bertambah & Listrik Berkurang                                    
+                                    $update_imp_2 = DB::table('battery')->where('id_users',$bat_import->id_users)
+                                    ->where('id_battery',$bat_import->id_battery)
+                                    ->update([
+                                        'bat_watt' => $bat_import->bat_watt - $import_to_user->residu_val,
+                                        'residu_val' => $import_to_user->capacity - $bat_import->residu_val,
+                                    ]);
+
+                                    $sum_bat_up_1 = DB::table('battery')->where('id_users',$bat_import->id_users)->sum('bat_watt');
+                                    $sum_cap_up_1 = DB::table('battery')->where('id_users',$bat_import->id_users)->sum('capacity');
+                                    $get_persentase_new_1 = ($sum_bat_up_1 / $sum_cap_up_1) * 100;
+
+                                    $recheck_saldo = DB::table('users')->where('id',$bat_import->id_users)->first();
+
+                                    $up_to_us_2 = DB::table('users')->where('id',$bat_import->id_users)->update([
+                                        'persentase' => $get_persentase_new_1,
+                                        'saldo' => $recheck_saldo->saldo + $import_to_user->residu_val,
+                                    ]);                                    
+                                    
+                                    $data_saldo -= $import_to_user->residu_val;                                    
+                                    $persentase_to_elect -= $import_to_user->residu_val;
+
+
+                                }elseif($import_to_user == TRUE AND $persentase_to_elect < $import_to_user->residu_val AND $persentase_to_elect > 0){
+                                    $update_imp_1 = DB::table('battery')->where('id_users',$import_to_user->id_users)
+                                    ->where('id_battery',$import_to_user->id_battery)
+                                    ->update([
+                                        'bat_watt' => $persentase_to_elect,
+                                        'residu_val' => $import_to_user->capacity - $persentase_to_elect,
+                                    ]);
+                                    
+                                    $sum_bat_up = DB::table('battery')->where('id_users',$import_to_user->id_users)->sum('bat_watt');
+                                    $sum_cap_up = DB::table('battery')->where('id_users',$import_to_user->id_users)->sum('capacity');
+                                    $get_persentase_new = ($sum_bat_up / $sum_cap_up) * 100;
+
+                                    $saldo_new2 = $data_saldo - $persentase_to_elect;
+
+                                    $up_to_us = DB::table('users')->where('id',$import_to_user->id_users)->update([
+                                        'persentase' => $get_persentase_new,
+                                        'saldo' => $saldo_new2,
+                                    ]);
+
+                                    // User yang Saldonya bertambah & Listrik Berkurang                                    
+                                    $update_imp_2 = DB::table('battery')->where('id_users',$bat_import->id_users)
+                                    ->where('id_battery',$bat_import->id_battery)
+                                    ->update([
+                                        'bat_watt' => $bat_import->bat_watt - $persentase_to_elect,
+                                        'residu_val' => $bat_import->residu_val + $persentase_to_elect,
+                                    ]);
+
+                                    $sum_bat_up_1 = DB::table('battery')->where('id_users',$bat_import->id_users)->sum('bat_watt');
+                                    $sum_cap_up_1 = DB::table('battery')->where('id_users',$bat_import->id_users)->sum('capacity');
+                                    $get_persentase_new_1 = ($sum_bat_up_1 / $sum_cap_up_1) * 100;
+
+                                    $recheck_saldo = DB::table('users')->where('id',$bat_import->id_users)->first();
+
+                                    $up_to_us_2 = DB::table('users')->where('id',$bat_import->id_users)->update([
+                                        'persentase' => $get_persentase_new_1,
+                                        'saldo' => $recheck_saldo->saldo + $persentase_to_elect,
+                                    ]);                                    
+                                    
+                                    $data_saldo -= $persentase_to_elect;                                    
+                                    $persentase_to_elect -= $persentase_to_elect;
+                                }
+                            }
+                            
+                        }else{
+                            // Jika Saldo Tidak ada
+                        }
+                    }
+                }
+            }else{
+                // Jika tidak ada user yang listriknya lebih dari 50 %
+            }
+        }else{
+            // Tidak Punya Saldo
+        }
+
     }
 }
