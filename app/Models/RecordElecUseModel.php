@@ -11,5 +11,5 @@ class RecordElecUseModel extends Model
 
     protected $table = "record_elec_use";
     protected $primaryKey = 'id_rec_elec_use';
-    protected $fillable = ['id_users','gen_1','gen_2','gen_3','elec_usage','elec_export','elec_import','created_at','updated_at'];
+    protected $fillable = ['id_users','gen_1','gen_2','gen_3','elec_usage','elec_export','elec_import','export_to','import_from','created_at','updated_at'];
 }

@@ -191,7 +191,7 @@
         <div class="col-auto">
             <a href="{{route('users.create')}}" class="btn btn-primary">Create New</a>      
         </div>
-        <br>
+        <br>       
         <!-- end page title -->
         <!-- KAMUS -->
         <div class="table-responsive">
