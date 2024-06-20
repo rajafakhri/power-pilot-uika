@@ -204,8 +204,7 @@
                     <th>Battery</th>
                     <th>Usage</th>
                     <th>Export</th>
-                    <th>Import</th>
-                    <th>Total</th>
+                    <th>Import</th>                    
                     <th>Action</th>
                     </tr>
                 </thead>
@@ -246,8 +245,7 @@
                         <td>{{$user->persentase}} %</td>                                              
                         <td>{{$data_usage}} Watt</td>
                         <td>{{$data_export}} Watt</td>
-                        <td>{{$data_import}} Watt</td>
-                        <td>{{$sum_batt}} Watt</td>
+                        <td>{{$data_import}} Watt</td>                        
                         <td>
                             <form onsubmit="return confirm('Are you sure ?');" action="{{ route('users.destroy', $user->id) }}" method="POST">
                                 <a href="{{route('users.up_generator')}}/{{$user->id}}" class="btn btn-primary"><i class="dripicons-battery-full"></i></a>

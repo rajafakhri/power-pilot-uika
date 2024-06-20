@@ -515,6 +515,16 @@ class UsersController extends Controller
                 }
             }
 
+            RecordElecUseModel::create([
+                'id_users'  => $id,
+                'gen_1'     => $gen_1,
+                'gen_2'     => $gen_2,
+                'gen_3'     => $gen_3,
+                'elec_usage' => 0,
+                'elec_export' => 0,
+                'elec_import' => 0,
+            ]);
+
 
             $get_sum_battery = DB::table('battery')->where('id_users',$id)->sum('bat_watt'); //Listrik dari battery (Watt)
             $sum_cap = DB::table('battery')->where('id_users',$id)->sum('capacity');

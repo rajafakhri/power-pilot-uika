@@ -1,6 +1,12 @@
 @extends('layouts.master_dashboard')
 @section('title','Dashboard')
 @section('content')
+<?php
+  use Carbon\Carbon;
+  $day = Carbon::now()->format('d');
+  $month = Carbon::now()->format('m');
+  $year = Carbon::now()->format('Y');    
+?>
 
 <div class="content-page 100vh">
         <div class="content">
@@ -39,13 +45,18 @@
               </li>
 
               <li class="notification-list">
-                <a
-                    href="../login/pages-login.html"
-                    class="nav-link"
+              <form method="POST" action="{{route('logout')}}">
+              @csrf
+              <a
+                  href="{{route('logout')}}"
+                  class="nav-link"
+                  onclick="event.preventDefault();
+                  this.closest('form').submit();"
                   >
-                    <i class="mdi mdi-logout noti-icon"></i>
-                    <span>Logout</span>
+                  <i class="mdi mdi-logout noti-icon"></i>
+                  <span>Logout</span>
                   </a>
+              </form>
               </li>
             </ul>
             <button class="button-menu-mobile open-left">
@@ -230,7 +241,7 @@
                   <div class="card card-h-100">
                     <div class="card-body">
                       <div class="d-flex justify-content-between align-items-center mb-2">
-                        <h4 class="header-title">Total battery power usage history yearly</h4>
+                        <h4 class="header-title">Total battery power usage history yearly</h4>                       
                       </div>
   
                       <div dir="ltr">
@@ -259,14 +270,8 @@
       </div>
 
       <script>
-      const xValuesD = [
-        "Sunday",
-        "Monday",
-        "Tuesday",
-        "Wednesday",
-        "Thursday",
-        "Friday",
-        "Saturday",
+      const xValuesD = [        
+        <?php for($i=1;$i <= 31;$i++){echo '"'.$i.'"',",";}?>
       ];
       const xValuesM = [
         "January",
@@ -282,12 +287,17 @@
         "November",
         "Desember",
       ];
-      const xValuesY = [2022, 2023, 2024];
+      const xValuesY = [
+        <?php 
+        for($y=$year-5;$y <= $year;$y++){
+            echo $y.",";
+        }
+        ?>];
       const defaultBarColor = "#727cf5";
       const highlightColor = "#f5727c";
 
       const barColorsD = xValuesD.map((day) =>
-        day === "Saturday" ? highlightColor : defaultBarColor
+        day === "<?php echo $day; ?>" ? highlightColor : defaultBarColor
       );
       new Chart("myChart1", {
         type: "bar",
@@ -296,7 +306,12 @@
           datasets: [
             {
               backgroundColor: barColorsD,
-              data: [91, 83, 97, 73, 55, 67, 49, 0],
+              data: [<?php 
+                for($i=1;$i <= 31;$i++){                   
+                  $usage_day = DB::table('record_elec_use')->whereDay('created_at', $i)->whereMonth('created_at',$month)->whereYear('created_at', $year)->sum('elec_usage');
+                  echo $usage_day,",";
+                }
+                ?>],
             },
           ],
         },
@@ -311,7 +326,7 @@
       });
 
       const barColorsM = xValuesM.map((month) =>
-        month === "June" ? highlightColor : defaultBarColor
+        month === "<?php echo Carbon::now()->format('F') ?>" ? highlightColor : defaultBarColor
       );
       new Chart("myChart", {
         type: "bar",
@@ -320,7 +335,13 @@
           datasets: [
             {
               backgroundColor: barColorsM,
-              data: [91, 83, 97, 73, 55, 67, 49, 13, 30, 7, 29, 73, 0],
+              data: [<?php 
+                for($v=1;$v <= 12;$v++){                   
+                  $usage_month = DB::table('record_elec_use')->whereMonth('created_at',$v)->sum('elec_usage');
+                  echo $usage_month,",";
+                }
+
+                ?>],
             },
           ],
         },
@@ -330,7 +351,7 @@
       });
 
       const barColorsY = xValuesY.map((year) =>
-        year === 2024 ? highlightColor : defaultBarColor
+        year === <?php echo $year; ?> ? highlightColor : defaultBarColor
       );
       new Chart("myChart2", {
         type: "bar",
@@ -339,7 +360,14 @@
           datasets: [
             {
               backgroundColor: barColorsY,
-              data: [91, 83, 97, 0],
+              data: [
+                <?php 
+
+                for($y=$year-5;$y <= $year;$y++){
+                  $data_years = DB::table('record_elec_use')->whereYear('created_at',$y)->sum('elec_usage');
+                      echo $data_years.",";
+                  }
+                ?>],
             },
           ],
         },
