@@ -57,4 +57,8 @@ Route::middleware('auth','owner')->group(function () {
     Route::get('/owner/battery', [BatteryOwnerController::class, 'index'])->name('owner.battery');
 });
 
+Route::middleware('auth','user')->group(function () {
+    
+});
+
 require __DIR__.'/auth.php';
