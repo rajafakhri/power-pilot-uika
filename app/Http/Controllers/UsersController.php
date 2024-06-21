@@ -18,8 +18,10 @@ class UsersController extends Controller
      */
     public function index()
     {
-        $users = User::latest()->paginate(5);        
-        return view('admin.data_users.users',compact('users'));
+
+        $users = User::latest()->where('level',3)->get();
+        $users_adm = User::latest()->where('level',1)->orWhere('level',2)->get();
+        return view('admin.data_users.users',compact('users','users_adm'));
         // return response()->json($users);
     }
 
@@ -486,8 +488,8 @@ class UsersController extends Controller
 
     public function up_generator($id){
         $gen_1 = 5000; //Generator 1
-        $gen_2 = 5000; //Generator 2
-        $gen_3 = 5000; //Generator 3
+        $gen_2 = 0; //Generator 2
+        $gen_3 = 0; //Generator 3
         
         $total_gen = $gen_1 + $gen_2 + $gen_3;                        
         $battery_user = DB::table('battery')->where('id_users',$id)->where('residu_val','>',0)->get();
@@ -515,18 +517,37 @@ class UsersController extends Controller
                 }
             }
 
+            
+
 
             $get_sum_battery = DB::table('battery')->where('id_users',$id)->sum('bat_watt'); //Listrik dari battery (Watt)
             $sum_cap = DB::table('battery')->where('id_users',$id)->sum('capacity');
-            $persentase_bat = ($get_sum_battery / $sum_cap) * 100; //Hitung Persentase
+            if($sum_cap == TRUE){
+                RecordElecUseModel::create([
+                    'id_users'  => $id,
+                    'gen_1'     => $gen_1,
+                    'gen_2'     => $gen_2,
+                    'gen_3'     => $gen_3,
+                    'elec_usage' => 0,
+                    'elec_export' => 0,
+                    'elec_import' => 0,
+                ]);
+    
+                $persentase_bat = ($get_sum_battery / $sum_cap) * 100; //Hitung Persentase
+    
+                $up_us_persen = DB::table('users')->where('id',$id)->update([
+                    'persentase' => $persentase_bat,
+                ]);
+    
+                //redirect to indexs
+                Alert::success('Success!', 'Battery is Fully Charged');
+                return back();
+            }else{
+                // Tidak Punya Battery
+                Alert::error('Error!', 'User Has No Battery');
+                return back();
+            }
 
-            $up_us_persen = DB::table('users')->where('id',$id)->update([
-                'persentase' => $persentase_bat,
-            ]);
-
-            //redirect to indexs
-            Alert::success('Success!', 'Battery is Fully Charged');
-            return back();
         }else{
             // Tidak Punya Battery
             Alert::error('Error!', 'User Has No Battery');
@@ -535,7 +556,7 @@ class UsersController extends Controller
         
     }
 
-    public function electric_export($id){
+    public function electric_export($id){        
         $usage = 2000; //Pemakaian (Watt)
         $get_sum_battery = DB::table('battery')->where('id_users',$id)->sum('bat_watt'); //Listrik dari battery (Watt)
         $sum_cap = DB::table('battery')->where('id_users',$id)->sum('capacity');
@@ -555,7 +576,7 @@ class UsersController extends Controller
             if($battery_user == TRUE){
                 foreach($battery_user as $battery){
                     $check_us = DB::table('users')
-                    ->where('id',$battery->id_users)->where('persentase','<',30)
+                    ->where('id',$battery->id_users)->where('persentase',0)
                     ->where('saldo','>=',$sum_export)->first();
 
                     if($check_us == TRUE AND $check_us->saldo >= $sum_export ){
@@ -619,10 +640,6 @@ class UsersController extends Controller
                                 $sum_export -= $battery->residu_val;
                             }
                         }
-                    }else{
-                        // Tidak Punya Battery
-                        Alert::error('Error!', 'No Battery to export');
-                        return back();
                     }
                 }
                 
@@ -707,6 +724,189 @@ class UsersController extends Controller
     }
 
     public function electric_import($id){
-        
+        $usage = 3000;
+        $cek_saldo = DB::table('users')->where('id',$id)->where('saldo','>',0)->first();
+        if($cek_saldo == TRUE){
+            $user_imp = DB::table('users')->where('id','!=',$id)->where('persentase','>',50)->get();
+            if($user_imp == TRUE){ //Cek User yang battery nya lebih dari 50 %
+                foreach($user_imp as $us_import){                                        
+                    // Hitung berapa mampunya user ini mengimport listrik
+                    $total_import_accept = $us_import->persentase - 50; //Hitung Berapa Persen bisa import
+                    $sum_cap = DB::table('battery')->where('id_users',$us_import->id)->sum('capacity'); // Hitung Kapasitas User untuk mendapatkan listrik dibattery user import
+                    $persentase_to_elect = ($total_import_accept / 100) * $sum_cap; //Ambil Jumlah Watt battery dari users yang bisa diimport
+                    $get_bat_us_imp = DB::table('battery')->where('id_users',$us_import->id)->where('bat_watt','>',0)->get(); //Data Battery Orang lain
+                    foreach($get_bat_us_imp as $bat_import){
+                        $recheck_saldo = DB::table('users')->where('id',$id)->first();                                    
+                        $data_saldo = $recheck_saldo->saldo;                        
+                        if($data_saldo > 0){
+                            // Jika Saldo Lebih besar dari Listrik yang diimport
+                            if($data_saldo >= $persentase_to_elect){
+                                $import_to_user = DB::table('battery')->where('id_users',$id)->where('residu_val','>',0)->first();
+                                if($import_to_user == TRUE AND $persentase_to_elect >= $import_to_user->residu_val){
+                                    $update_imp_1 = DB::table('battery')->where('id_users',$import_to_user->id_users)
+                                    ->where('id_battery',$import_to_user->id_battery)
+                                    ->update([
+                                        'bat_watt' => $import_to_user->residu_val,
+                                        'residu_val' => $import_to_user->capacity - $import_to_user->residu_val,
+                                    ]);
+
+                                    $sum_bat_up = DB::table('battery')->where('id_users',$import_to_user->id_users)->sum('bat_watt');
+                                    $sum_cap_up = DB::table('battery')->where('id_users',$import_to_user->id_users)->sum('capacity');
+                                    $get_persentase_new = ($sum_bat_up / $sum_cap_up) * 100;
+                                    
+                                    $saldo_new = $data_saldo - $import_to_user->residu_val;
+
+                                    $up_to_us = DB::table('users')->where('id',$import_to_user->id_users)->update([
+                                        'persentase' => $get_persentase_new,
+                                        'saldo' => $saldo_new,
+                                    ]);
+
+                                    // User yang Saldonya bertambah & Listrik Berkurang                                    
+                                    $update_imp_2 = DB::table('battery')->where('id_users',$bat_import->id_users)
+                                    ->where('id_battery',$bat_import->id_battery)
+                                    ->update([
+                                        'bat_watt' => $bat_import->bat_watt - $import_to_user->residu_val,
+                                        'residu_val' => $import_to_user->capacity - $bat_import->residu_val,
+                                    ]);
+
+                                    $sum_bat_up_1 = DB::table('battery')->where('id_users',$bat_import->id_users)->sum('bat_watt');
+                                    $sum_cap_up_1 = DB::table('battery')->where('id_users',$bat_import->id_users)->sum('capacity');
+                                    $get_persentase_new_1 = ($sum_bat_up_1 / $sum_cap_up_1) * 100;
+
+                                    $recheck_saldo = DB::table('users')->where('id',$bat_import->id_users)->first();
+
+                                    $up_to_us_2 = DB::table('users')->where('id',$bat_import->id_users)->update([
+                                        'persentase' => $get_persentase_new_1,
+                                        'saldo' => $recheck_saldo->saldo + $import_to_user->residu_val,
+                                    ]);
+
+                                    RecordElecUseModel::create([
+                                        'id_users'  => $id,
+                                        'gen_1'     => 0,
+                                        'gen_2'     => 0,
+                                        'gen_3'     => 0,
+                                        'elec_usage' => $usage,                                    
+                                        'elec_import' => $import_to_user->residu_val,
+                                        'import_from' => $bat_import->id_users,
+                                    ]);
+                                    
+                                    $data_saldo -= $import_to_user->residu_val;                                    
+                                    $persentase_to_elect -= $import_to_user->residu_val;
+
+
+                                }elseif($import_to_user == TRUE AND $persentase_to_elect < $import_to_user->residu_val AND $persentase_to_elect > 0){
+                                    $update_imp_1 = DB::table('battery')->where('id_users',$import_to_user->id_users)
+                                    ->where('id_battery',$import_to_user->id_battery)
+                                    ->update([
+                                        'bat_watt' => $persentase_to_elect,
+                                        'residu_val' => $import_to_user->capacity - $persentase_to_elect,
+                                    ]);
+                                    
+                                    $sum_bat_up = DB::table('battery')->where('id_users',$import_to_user->id_users)->sum('bat_watt');
+                                    $sum_cap_up = DB::table('battery')->where('id_users',$import_to_user->id_users)->sum('capacity');
+                                    $get_persentase_new = ($sum_bat_up / $sum_cap_up) * 100;
+
+                                    $saldo_new2 = $data_saldo - $persentase_to_elect;
+
+                                    $up_to_us = DB::table('users')->where('id',$import_to_user->id_users)->update([
+                                        'persentase' => $get_persentase_new,
+                                        'saldo' => $saldo_new2,
+                                    ]);
+
+                                    // User yang Saldonya bertambah & Listrik Berkurang                                    
+                                    $update_imp_2 = DB::table('battery')->where('id_users',$bat_import->id_users)
+                                    ->where('id_battery',$bat_import->id_battery)
+                                    ->update([
+                                        'bat_watt' => $bat_import->bat_watt - $persentase_to_elect,
+                                        'residu_val' => $bat_import->residu_val + $persentase_to_elect,
+                                    ]);
+
+                                    $sum_bat_up_1 = DB::table('battery')->where('id_users',$bat_import->id_users)->sum('bat_watt');
+                                    $sum_cap_up_1 = DB::table('battery')->where('id_users',$bat_import->id_users)->sum('capacity');
+                                    $get_persentase_new_1 = ($sum_bat_up_1 / $sum_cap_up_1) * 100;
+
+                                    $recheck_saldo = DB::table('users')->where('id',$bat_import->id_users)->first();
+
+                                    $up_to_us_2 = DB::table('users')->where('id',$bat_import->id_users)->update([
+                                        'persentase' => $get_persentase_new_1,
+                                        'saldo' => $recheck_saldo->saldo + $persentase_to_elect,
+                                    ]);
+
+                                    RecordElecUseModel::create([
+                                        'id_users'  => $id,
+                                        'gen_1'     => 0,
+                                        'gen_2'     => 0,
+                                        'gen_3'     => 0,
+                                        'elec_usage' => $usage,                                    
+                                        'elec_import' => $bat_import->bat_watt - $persentase_to_elect,
+                                        'import_from' => $bat_import->id_users,
+                                    ]);
+                                    
+                                    $data_saldo -= $persentase_to_elect;                                    
+                                    $persentase_to_elect -= $persentase_to_elect;
+                                }                                                            
+
+                            }else{
+                                // Jika Saldo Sudah Tidak Cukup Tapi Telah terjadi Import Sebelumnyay                                
+                            }
+                            
+                        }else{
+                            // Jika Saldo Tidak ada
+                        }
+                    }
+                }
+            }else{
+                // Jika tidak ada user yang listriknya lebih dari 50 %
+            }
+            
+            $get_us_bat_new = DB::table('battery')->where('id_users',$id)->get();
+            $get_sum_battery_new = DB::table('battery')->where('id_users',$id)->sum('bat_watt');
+
+            if($get_us_bat_new == TRUE AND $get_sum_battery_new >= $usage){
+                foreach($get_us_bat_new as $us_bat_new){
+                    if($usage > 0){
+                        if($usage >= $us_bat_new->bat_watt){
+                            $up_usage_bat = DB::table('battery')->where('id_users',$id)->where('id_battery',$us_bat_new->id_battery)->update([
+                                'bat_watt' => 0,
+                                'residu_val' => $us_bat_new->capacity,
+                            ]);                            
+                            $usage -= $us_bat_new->capacity;
+                        }else{
+                            // Jika Pemakaian kurang dari Battery yang ada                            
+                            $residu_val_new = $us_bat_new->capacity - ($us_bat_new->bat_watt - $usage);
+                            $up_usage_bat = DB::table('battery')->where('id_users',$id)->where('id_battery',$us_bat_new->id_battery)->update([
+                                'bat_watt' => $us_bat_new->bat_watt - $usage,
+                                'residu_val' => $residu_val_new,
+                            ]);
+
+                            $usage -= $us_bat_new->bat_watt;
+                        }                        
+                    }
+
+                    $sum_bat_have = DB::table('battery')->where('id_users',$id)->sum('bat_watt');
+                    $sum_cap_have = DB::table('battery')->where('id_users',$id)->sum('capacity');
+                    $get_persentase_have = ($sum_bat_have / $sum_cap_have) * 100;                        
+
+                    $up_to_us_have = DB::table('users')->where('id',$id)->update([
+                        'persentase' => $get_persentase_have,                            
+                    ]);  
+                }
+
+                //redirect to indexs
+                Alert::success('Success!', 'Imported Successfully');
+                return back(); 
+                
+            }else{
+                // Jika Battery Tidak Cukup dengan Pemakaian
+                Alert::warning('Warning!', 'Import successfully but battery is not enough with usage');
+                return back();
+            }            
+
+        }else{
+            // Tidak Punya Saldo
+            Alert::error('Error!', 'You have no balance');
+            return back();
+        }
+
     }
 }

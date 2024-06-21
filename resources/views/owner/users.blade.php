@@ -19,12 +19,10 @@
                 <tr>
                 <th>No</th>
                 <th>User</th>
-                <th colspan="3">Generator</th>
-                <th colspan="3">Battery</th>
+                <th colspan="3">Generator</th>                
                 <th>Usage</th>
                 <th>Export</th>
-                <th>Import</th>
-                <th>Total</th>                
+                <th>Import</th>                
                 </tr>
             </thead>
             <tbody>
@@ -39,39 +37,24 @@
                     $data_export = DB::table('record_elec_use')->where('id_users',$user->id)->sum('elec_export');
                     $data_import = DB::table('record_elec_use')->where('id_users',$user->id)->sum('elec_import');
 
+                    $sum_gen1 = DB::table('record_elec_use')->where('id_users',$user->id)->sum('gen_1');
+                    $sum_gen2 = DB::table('record_elec_use')->where('id_users',$user->id)->sum('gen_2');
+                    $sum_gen3 = DB::table('record_elec_use')->where('id_users',$user->id)->sum('gen_3');
+
                 ?>                    
                 <tr>                        
                     <td>{{$no++}}</td>
                     <td>{{$user->name}}</td>
                     @if($check_record == TRUE)
-                    <td>{{$check_record->gen_1}} Watt</td>
-                    <td>{{$check_record->gen_2}} Watt</td>
-                    <td>{{$check_record->gen_3}} Watt</td>
+                    <td>{{$sum_gen1}} Watt</td>
+                    <td>{{$sum_gen2}} Watt</td>
+                    <td>{{$sum_gen3}} Watt</td>
                     @else
                     <td colspan="3">Not Found</td>
-                    @endif                        
-                    @if($count_battery == 3)
-                        @foreach($get_battery as $get_battery)
-                        <td>{{$get_battery->nm_battery}}</td>
-                        @endforeach                        
-                    @elseif($count_battery == 2)
-                        @foreach($get_battery as $get_battery)
-                        <td>{{$get_battery->nm_battery}}</td>
-                        @endforeach  
-                        <td>-</td>
-                    @elseif($count_battery == 1)
-                        @foreach($get_battery as $get_battery)
-                        <td>{{$get_battery->nm_battery}}</td>
-                        @endforeach  
-                        <td>-</td>
-                        <td>-</td>
-                    @else
-                        <td colspan="3">Not Found</td>
-                    @endif                        
+                    @endif                                              
                     <td>{{$data_usage}} Watt</td>
                     <td>{{$data_export}} Watt</td>
-                    <td>{{$data_import}} Watt</td>
-                    <td>{{$sum_batt}} Watt</td>
+                    <td>{{$data_import}} Watt</td>                    
                 </tr>
                 @endforeach
 

@@ -191,7 +191,7 @@
         <div class="col-auto">
             <a href="{{route('users.create')}}" class="btn btn-primary">Create New</a>      
         </div>
-        <br>
+        <br>       
         <!-- end page title -->
         <!-- KAMUS -->
         <div class="table-responsive">
@@ -204,8 +204,7 @@
                     <th>Battery</th>
                     <th>Usage</th>
                     <th>Export</th>
-                    <th>Import</th>
-                    <th>Total</th>
+                    <th>Import</th>                    
                     <th>Action</th>
                     </tr>
                 </thead>
@@ -226,6 +225,10 @@
                         // }else{
                         //     $persentase_bat = 0;
                         // }
+
+                        $sum_gen1 = DB::table('record_elec_use')->where('id_users',$user->id)->sum('gen_1');
+                        $sum_gen2 = DB::table('record_elec_use')->where('id_users',$user->id)->sum('gen_2');
+                        $sum_gen3 = DB::table('record_elec_use')->where('id_users',$user->id)->sum('gen_3');
                         
                         $battery_user = DB::table('battery')->join('users','users.id','battery.id_users')
                             ->where('id_users','!=',6)->where('residu_val','>',0)->where('persentase','<',30)
@@ -237,27 +240,64 @@
                         <td>{{$no++}}</td>
                         <td>{{$user->name}}</td>
                         @if($check_record == TRUE)
-                        <td>{{$check_record->gen_1}} Watt</td>
-                        <td>{{$check_record->gen_2}} Watt</td>
-                        <td>{{$check_record->gen_3}} Watt</td>
+                        <td>{{$sum_gen1}} Watt</td>
+                        <td>{{$sum_gen2}} Watt</td>
+                        <td>{{$sum_gen3}} Watt</td>
                         @else
                         <td colspan="3">Not Found</td>
                         @endif                                                
                         <td>{{$user->persentase}} %</td>                                              
                         <td>{{$data_usage}} Watt</td>
                         <td>{{$data_export}} Watt</td>
-                        <td>{{$data_import}} Watt</td>
-                        <td>{{$sum_batt}} Watt</td>
+                        <td>{{$data_import}} Watt</td>                        
                         <td>
                             <form onsubmit="return confirm('Are you sure ?');" action="{{ route('users.destroy', $user->id) }}" method="POST">
                                 <a href="{{route('users.up_generator')}}/{{$user->id}}" class="btn btn-primary"><i class="dripicons-battery-full"></i></a>
                                 @if($user->persentase > 50)
                                 <a href="{{route('users.export')}}/{{$user->id}}" class="btn btn-primary"><i class="dripicons-export"></i></a>
-                                @else
-                                <a href="{{route('users.import')}}/{{$user->id}}" class="btn btn-primary"><i class="dripicons-export"></i></a>
+                                @elseif($user->persentase == 0)
+                                <a href="{{route('users.import')}}/{{$user->id}}" class="btn btn-danger"><i class="dripicons-battery-low"></i></a>
                                 @endif
                                 <a href="{{route('users.details')}}/{{$user->id}}" class="btn btn-primary"><i class="mdi mdi-home"></i></a>
                                 <a class="btn btn-primary" href="{{route('users.edit', $user->id)}}" class="action-icon"> <i class="mdi mdi-square-edit-outline"></i></a>                                                        
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-danger" class=""> <i class="mdi mdi-delete"></i></button>
+                            </form>
+                        </td>
+                    </tr>
+                    @endforeach
+
+                </tbody>
+            </table>
+        </div>
+
+        <br>
+        <h3>Users Manager</h3>
+        <div class="table-responsive">
+            <table class="table table-centered table-nowrap mb-0">
+                <thead class="table-light">
+                    <tr>
+                    <th>No</th>
+                    <th>Name</th>
+                    <th>Role</th>
+                    <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @php $no_adm=1; @endphp
+                    @foreach($users_adm as $us_adm)    
+                    <tr>                        
+                        <td>{{$no_adm++}}</td>
+                        <td>{{$us_adm->name}}</td>
+                        @if($us_adm->level == 1)
+                        <td>Admin</td>
+                        @elseif($us_adm->level == 2)
+                        <td>Owner</td>
+                        @endif
+                        <td>
+                            <form onsubmit="return confirm('Are you sure ?');" action="{{ route('users.destroy', $us_adm->id) }}" method="POST">                                                                
+                                <a class="btn btn-primary" href="{{route('users.edit', $us_adm->id)}}" class="action-icon"> <i class="mdi mdi-square-edit-outline"></i></a>                                                        
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="btn btn-danger" class=""> <i class="mdi mdi-delete"></i></button>
