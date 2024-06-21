@@ -196,7 +196,7 @@
             $get_batt = DB::table('battery')->where('id_users',$id)->get();   
             $battery_user_imp = DB::table('battery')->where('id_users',$id)->where('bat_watt','>',0)->first(); //Ambil listrik dari batrai yang punya listrik            
         ?>    
-        <h4>Electrical Capacity <a href="{{route('users.details.random')}}/{{$id}}" class="btn btn-primary"><i class="mdi mdi-reload"></i></a></h4>         
+        <h4>Electrical Capacity</h4>         
         <div class="table-responsive">
             <table class="table table-centered table-nowrap mb-0">
                 <thead>                        
