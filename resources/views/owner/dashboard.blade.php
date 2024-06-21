@@ -171,7 +171,7 @@
               backgroundColor: barColorsM,
               data: [<?php 
                 for($v=1;$v <= 12;$v++){                   
-                  $usage_month = DB::table('record_elec_use')->whereMonth('created_at',$v)->sum('elec_usage');
+                  $usage_month = DB::table('record_elec_use')->whereMonth('created_at',$v)->whereYear('created_at', $year)->sum('elec_usage');
                   echo $usage_month,",";
                 }
 
