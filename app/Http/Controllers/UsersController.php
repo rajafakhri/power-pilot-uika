@@ -18,9 +18,11 @@ class UsersController extends Controller
      */
     public function index()
     {
+
         $users = User::latest()->where('level',3)->get();
         $users_adm = User::latest()->where('level',1)->orWhere('level',2)->get();
         return view('admin.data_users.users',compact('users','users_adm'));
+        // return response()->json($users);
     }
 
     /**
