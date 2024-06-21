@@ -515,28 +515,37 @@ class UsersController extends Controller
                 }
             }
 
-            RecordElecUseModel::create([
-                'id_users'  => $id,
-                'gen_1'     => $gen_1,
-                'gen_2'     => $gen_2,
-                'gen_3'     => $gen_3,
-                'elec_usage' => 0,
-                'elec_export' => 0,
-                'elec_import' => 0,
-            ]);
+            
 
 
             $get_sum_battery = DB::table('battery')->where('id_users',$id)->sum('bat_watt'); //Listrik dari battery (Watt)
             $sum_cap = DB::table('battery')->where('id_users',$id)->sum('capacity');
-            $persentase_bat = ($get_sum_battery / $sum_cap) * 100; //Hitung Persentase
+            if($sum_cap == TRUE){
+                RecordElecUseModel::create([
+                    'id_users'  => $id,
+                    'gen_1'     => $gen_1,
+                    'gen_2'     => $gen_2,
+                    'gen_3'     => $gen_3,
+                    'elec_usage' => 0,
+                    'elec_export' => 0,
+                    'elec_import' => 0,
+                ]);
+    
+                $persentase_bat = ($get_sum_battery / $sum_cap) * 100; //Hitung Persentase
+    
+                $up_us_persen = DB::table('users')->where('id',$id)->update([
+                    'persentase' => $persentase_bat,
+                ]);
+    
+                //redirect to indexs
+                Alert::success('Success!', 'Battery is Fully Charged');
+                return back();
+            }else{
+                // Tidak Punya Battery
+                Alert::error('Error!', 'User Has No Battery');
+                return back();
+            }
 
-            $up_us_persen = DB::table('users')->where('id',$id)->update([
-                'persentase' => $persentase_bat,
-            ]);
-
-            //redirect to indexs
-            Alert::success('Success!', 'Battery is Fully Charged');
-            return back();
         }else{
             // Tidak Punya Battery
             Alert::error('Error!', 'User Has No Battery');
