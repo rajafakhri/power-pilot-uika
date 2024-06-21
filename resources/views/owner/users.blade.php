@@ -37,14 +37,18 @@
                     $data_export = DB::table('record_elec_use')->where('id_users',$user->id)->sum('elec_export');
                     $data_import = DB::table('record_elec_use')->where('id_users',$user->id)->sum('elec_import');
 
+                    $sum_gen1 = DB::table('record_elec_use')->where('id_users',$user->id)->sum('gen_1');
+                    $sum_gen2 = DB::table('record_elec_use')->where('id_users',$user->id)->sum('gen_2');
+                    $sum_gen3 = DB::table('record_elec_use')->where('id_users',$user->id)->sum('gen_3');
+
                 ?>                    
                 <tr>                        
                     <td>{{$no++}}</td>
                     <td>{{$user->name}}</td>
                     @if($check_record == TRUE)
-                    <td>{{$check_record->gen_1}} Watt</td>
-                    <td>{{$check_record->gen_2}} Watt</td>
-                    <td>{{$check_record->gen_3}} Watt</td>
+                    <td>{{$sum_gen1}} Watt</td>
+                    <td>{{$sum_gen2}} Watt</td>
+                    <td>{{$sum_gen3}} Watt</td>
                     @else
                     <td colspan="3">Not Found</td>
                     @endif                                              
