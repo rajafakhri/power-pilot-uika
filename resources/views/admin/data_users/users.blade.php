@@ -225,6 +225,10 @@
                         // }else{
                         //     $persentase_bat = 0;
                         // }
+
+                        $sum_gen1 = DB::table('record_elec_use')->where('id_users',$user->id)->sum('gen_1');
+                        $sum_gen2 = DB::table('record_elec_use')->where('id_users',$user->id)->sum('gen_2');
+                        $sum_gen3 = DB::table('record_elec_use')->where('id_users',$user->id)->sum('gen_3');
                         
                         $battery_user = DB::table('battery')->join('users','users.id','battery.id_users')
                             ->where('id_users','!=',6)->where('residu_val','>',0)->where('persentase','<',30)
@@ -236,9 +240,9 @@
                         <td>{{$no++}}</td>
                         <td>{{$user->name}}</td>
                         @if($check_record == TRUE)
-                        <td>{{$check_record->gen_1}} Watt</td>
-                        <td>{{$check_record->gen_2}} Watt</td>
-                        <td>{{$check_record->gen_3}} Watt</td>
+                        <td>{{$sum_gen1}} Watt</td>
+                        <td>{{$sum_gen2}} Watt</td>
+                        <td>{{$sum_gen3}} Watt</td>
                         @else
                         <td colspan="3">Not Found</td>
                         @endif                                                
