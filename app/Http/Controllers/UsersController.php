@@ -20,6 +20,7 @@ class UsersController extends Controller
     {
         $users = User::latest()->paginate(5);        
         return view('admin.data_users.users',compact('users'));
+        // return response()->json($users);
     }
 
     /**
